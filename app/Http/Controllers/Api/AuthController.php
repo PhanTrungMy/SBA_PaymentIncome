@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
 
 
@@ -35,20 +33,30 @@ class AuthController extends Controller
     }
     public function logout()
     {
-        auth()->logout();
+        $user = Auth::user();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is not logged in',
+            ], 400);
+        }
+
+        Auth::logout();
+
+        return response()->json([
+            'message' => 'Logged out successfully',
+        ], 200);
     }
    protected function createNewToken($token){
-
-    $ttl = config('jwt.ttl'); // Replace 'jwt.ttl' with your JWT TTL configuration key
 
     return response()->json([
         'access_token' => $token,
         'token_type' => 'bearer',
-        'expires_in' => $ttl * 60, // Assuming the TTL is in minutes
-        'user' => auth('api')->user()
+        'expires_in' => auth('api')->factory()->getTTL() * 60,
+        'user' =>auth('api')->user()
     ]);
+
 
 }
 }

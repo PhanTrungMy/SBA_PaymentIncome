@@ -10,10 +10,8 @@ class Group extends Model
     use HasFactory;
     protected $fillable = [
         'name',
-        'description',
-        'user_id',
-        'created_at',
-        'updated_at',
+        'reportType',
+      
     ];
     public function categories()
     {
