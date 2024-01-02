@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PaymentOrderController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\CategoryController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +23,7 @@ use Illuminate\Support\Facades\Route;
 // });
 Route::group([
     'prefix' => 'auth',
-     'middleware' => 'api',
+    'middleware' => 'api',
 ], function ($router) {
     Route::post('login', [AuthController::class, 'login']);
 });
@@ -36,7 +38,7 @@ Route::group([
 Route::group([
     'middleware' => [
         'checkLogin',
-         'verifyToken',
+        'verifyToken',
     ],
 ], function () {
     // groups all
@@ -62,5 +64,20 @@ Route::group([
         'verifyToken'
     ],
 ], function () {
+    //payments Id
     Route::get("{id}", [PaymentOrderController::class, "PaymentOrderId"])->name('payments_id');
 });
+Route::group([
+    'prefix' => 'categories',
+    'middleware' => [
+        'checkLogin',
+         'verifyToken',
+    ],
+], function () {
+    // categories
+    Route::post('', [CategoryController::class, 'store']);
+    Route::get('', [CategoryController::class, 'index']);
+    Route::get('{id}', [CategoryController::class, 'show']);
+    Route::put('{id}', [CategoryController::class, 'update']);
+});
+
