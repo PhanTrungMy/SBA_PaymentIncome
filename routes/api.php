@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\GroupController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\PaymentOrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -41,4 +41,26 @@ Route::group([
 ], function () {
     // groups all
     Route::get('groups', [GroupController::class, "get_all_groups"])->name('groups');
+});
+Route::group([
+    'prefix' => 'payment_orders',
+    'middleware' => [
+        'checkLogin',
+         'verifyToken',
+    ],
+], function () {
+    // payments
+    Route::get('', [PaymentOrderController::class, "get_all_payment_orders"])->name('payments');
+    Route::post('', [PaymentOrderController::class, "create_payment_order"])->name('create_payments');
+    Route::put('{id}', [PaymentOrderController::class, "update_payment_order"])->name('update_payments');
+    Route::delete('{id}', [PaymentOrderController::class, "delete_payment_order"])->name('delete_payments');
+});
+Route::group([
+    'prefix' => 'payment_orders',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get("{id}", [PaymentOrderController::class, "PaymentOrderId"])->name('payments_id');
 });
