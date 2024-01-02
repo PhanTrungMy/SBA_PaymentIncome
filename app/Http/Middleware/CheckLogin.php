@@ -22,7 +22,7 @@ class CheckLogin
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthorized',
-            ], 401);
+            ], 500);
         }
 
         return $next($request);

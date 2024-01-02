@@ -19,5 +19,8 @@ class Category extends Model
     public function payments(){
         return $this->hasMany(Payment::class);
     }
+    public function balance_sheets(){
+        return $this->hasMany(BalanceSheet::class);
+    }
 
 }
