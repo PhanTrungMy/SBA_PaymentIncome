@@ -10,7 +10,7 @@ use App\Http\Controllers\Controller;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request)
+    public function catogory_show_all(Request $request)
     {
         try {
             $perPage = $request->query('per_page', 10);
@@ -66,7 +66,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
-    public function show($id)
+    public function catogory_show_id($id)
     {
         try {
             $category = Category::find($id);
@@ -90,7 +90,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
-    public function store(Request $request)
+    public function catogory_create(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -124,7 +124,15 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Create new category successfully',
-                'category' => $category
+                'category' => [
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'group_id' => $category->group_id,
+                    'payment_count' => $category->payment_count,
+                    'created_at' => $category->created_at->toDateTimeString(),
+                    'updated_at' => $category->updated_at->toDateTimeString(),
+                    'deleted_at' => $category->deleted_at
+                ]
             ], 200);
         } catch (Exception $e) {
             return response()->json([
@@ -133,7 +141,8 @@ class CategoryController extends Controller
             ], 500);
         }
     }
-    public function update(Request $request, $id)
+
+    public function catogory_update(Request $request, $id)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -142,10 +151,21 @@ class CategoryController extends Controller
             ]);
 
             if ($validator->fails()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $validator->errors()->first()
-                ], 400);
+                $errors = $validator->errors();
+
+                if ($errors->has('name')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Field name is required'
+                    ], 400);
+                }
+
+                if ($errors->has('group_id')) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Group not found'
+                    ], 404);
+                }
             }
 
             $category = Category::find($id);
@@ -173,6 +193,49 @@ class CategoryController extends Controller
                 'success' => true,
                 'message' => 'Update category successfully',
                 'category' => $category
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
+    }
+    public function catogory_delete($id)
+    {
+        try {
+            $category = Category::find($id);
+
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found'
+                ], 404);
+            }
+
+            if ($category->payment_count > 0) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The category has generated transactions',
+                    'payment_count' => $category->payment_count
+                ], 409);
+            }
+
+            $deletedCategory = clone $category;
+            $category->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Deleted category successfully',
+                'category' => [
+                    'id' => $deletedCategory->id,
+                    'name' => $deletedCategory->name,
+                    'group_id' => $deletedCategory->group_id,
+                    'is_update' => 0,
+                    'created_at' => $deletedCategory->created_at->toDateTimeString(),
+                    'updated_at' => $deletedCategory->updated_at->toDateTimeString(),
+                    'deleted_at' => now()->toDateTimeString()
+                ]
             ], 200);
         } catch (Exception $e) {
             return response()->json([
