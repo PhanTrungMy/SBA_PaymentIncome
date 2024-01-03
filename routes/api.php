@@ -41,12 +41,12 @@ Route::group([
         'verifyToken',
     ],
 ], function () {
-    // groups all
-    Route::get('groups', [GroupController::class, "get_all_groups"])->name('groups');
-    Route::post('/categories', [CategoryController::class, 'store']);
-    Route::get('/categories', [CategoryController::class, 'index']);
-    Route::get('/categories/{id}', [CategoryController::class, 'show']);
-    Route::put('/categories/{id}', [CategoryController::class, 'update']);
+
+    Route::post('/categories', [CategoryController::class, 'catogory_create']);
+    Route::get('/categories', [CategoryController::class, 'catogory_show_all']);
+    Route::get('/categories/{id}', [CategoryController::class, 'catogory_show_id']);
+    Route::put('/categories/{id}', [CategoryController::class, 'catogory_update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'catogory_delete']);
 });
 // Route::middleware('auth:api')->group(function () {
 //     Route::post('/categories', [CategoryController::class, 'store']);
