@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\GroupController;
-use App\Http\Controllers\PaymentOrderController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CategoryController;
@@ -43,7 +43,11 @@ Route::group([
     ],
 ], function () {
     // groups all
-    Route::get('groups', [GroupController::class, "get_all_groups"])->name('groups');
+    Route::post('/categories', [CategoryController::class, 'catogory_create']);
+    Route::get('/categories', [CategoryController::class, 'catogory_show_all']);
+    Route::get('/categories/{id}', [CategoryController::class, 'catogory_show_id']);
+    Route::put('/categories/{id}', [CategoryController::class, 'catogory_update']);
+    Route::delete('/categories/{id}', [CategoryController::class, 'catogory_delete']);
 });
 Route::group([
     'prefix' => 'payment_orders',
@@ -98,9 +102,10 @@ Route::group([
     ],
 ], function () {
     // categories
-    Route::post('', [CategoryController::class, 'store']);
-    Route::get('', [CategoryController::class, 'index']);
-    Route::get('{id}', [CategoryController::class, 'show']);
-    Route::put('{id}', [CategoryController::class, 'update']);
+    Route::post('', [CategoryController::class, 'catogory_create']);
+    Route::get('', [CategoryController::class, 'catogory_show_all']);
+    Route::get('{id}', [CategoryController::class, 'catogory_show_id']);
+    Route::put('{id}', [CategoryController::class, 'catogory_update']);
+    Route::delete('{id}', [CategoryController::class, 'catogory_delete']);
 });
 

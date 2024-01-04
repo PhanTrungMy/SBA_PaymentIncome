@@ -20,7 +20,7 @@ class PaymentFactory extends Factory
             'user_id' => User::factory(),
             'name' => $this->faker->word,
             'cost' => $this->faker->randomFloat(2, 10, 500), 
-            'currency_type' => $this->faker->randomElement(['USD', 'JPY']),
+            'currency_type' => $this->faker->randomElement(['USD', 'JPY', 'EUR']),
             'note' => $this->faker->text,
             'invoice' => $this->faker->text(50),
             'pay' => $this->faker->text(50),
