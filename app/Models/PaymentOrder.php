@@ -15,6 +15,8 @@ class PaymentOrder extends Model
         'usd',
         'exchange_rate_id',
         'payment_date',
+        'deleted_at'
+
     ];
     public function user(){
         return $this->belongsTo(User::class);

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,3 +49,63 @@ Route::group([
     Route::put('/categories/{id}', [CategoryController::class, 'catogory_update']);
     Route::delete('/categories/{id}', [CategoryController::class, 'catogory_delete']);
 });
+Route::group([
+    'prefix' => 'payment_orders',
+    'middleware' => [
+        'checkLogin',
+         'verifyToken',
+    ],
+], function () {
+    // payment_orders
+    Route::get('', [PaymentOrderController::class, "get_all_payment_orders"])->name('payments');
+    Route::post('', [PaymentOrderController::class, "create_payment_order"])->name('create_payment_orders');
+    Route::put('{id}', [PaymentOrderController::class, "update_payment_order"])->name('update_payment_orders');
+    Route::delete('{id}', [PaymentOrderController::class, "delete_payment_order"])->name('delete_payment_orders');
+});
+Route::group([
+    'prefix' => 'payment_orders',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    //payment_order Id
+    Route::get("{id}", [PaymentOrderController::class, "PaymentOrderId"])->name('payments_order_id');
+});
+Route::group([
+    'prefix' => 'payments',
+    'middleware' => [
+        'checkLogin',
+         'verifyToken',
+    ],
+], function () {
+    // payments
+    Route::post('', [PaymentController::class, "create_payments"])->name('create_payments');
+
+});
+Route::group([
+    'prefix' => 'payment_orders',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    //payments Id
+
+});
+
+Route::group([
+    'prefix' => 'categories',
+    'middleware' => [
+        'checkLogin',
+         'verifyToken',
+    ],
+], function () {
+    // categories
+    Route::post('', [CategoryController::class, 'catogory_create']);
+    Route::get('', [CategoryController::class, 'catogory_show_all']);
+    Route::get('{id}', [CategoryController::class, 'catogory_show_id']);
+    Route::put('{id}', [CategoryController::class, 'catogory_update']);
+    Route::delete('{id}', [CategoryController::class, 'catogory_delete']);
+});
+
