@@ -14,7 +14,7 @@ class ExchangeRateFactory extends Factory
     public function definition(): array
     {
         return [
-            'jpy' => $this->faker->randomFloat(4, 100, 150),
+            'jpn' => $this->faker->randomFloat(4, 100, 150),
             'usd' => $this->faker->randomFloat(4, 0.8, 1.2), 
             'exchange_rate_month' => $this->faker->dateTimeThisMonth(),
         

@@ -15,11 +15,10 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('company_name', 255);
-            $table->decimal('jpy',24,4)->nullable();
-            $table->decimal('usd',24,4)->nullable();
-            $table->decimal('vnd',24,4)->nullable();
+            $table->float('jpy')->nullable();
+            $table->float('usd')->nullable();
             $table->unsignedBigInteger('exchange_rate_id');
-            $table->date('payment_date')->nullable();
+            $table->dateTime('payment_date')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

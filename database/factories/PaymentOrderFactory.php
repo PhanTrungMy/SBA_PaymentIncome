@@ -21,7 +21,6 @@ class PaymentOrderFactory extends Factory
             'company_name' => $this->faker->company,
             'jpy' => $this->faker->randomFloat(2, 100, 10000), 
             'usd' => $this->faker->randomFloat(2, 50, 5000), 
-            'vnd' => $this->faker->randomFloat(2, 50, 5000), 
             'exchange_rate_id' => ExchangeRate::factory(),
             'payment_date' => $this->faker->dateTimeBetween('-1 year', 'now'), 
         ];
