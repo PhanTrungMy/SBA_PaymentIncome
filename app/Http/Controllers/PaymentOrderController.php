@@ -16,7 +16,8 @@ class PaymentOrderController extends Controller
         $curPage = $request->query('cur_page') ?? 1;
         $payment_order = DB::select("
         SELECT `id`,`user_id`, `company_name`,`jpy`,`vnd`,`usd`,`exchange_rate_id`,`payment_date`, `created_at`, `updated_at`, `deleted_at`
-        FROM `payment_orders`
+        FROM `payment_orders` 
+        WHERE deleted_at IS NULL
         LIMIT :limit OFFSET :offset
     ", ['limit' => $perPage, 'offset' => ($curPage - 1) * $perPage]);
 
@@ -103,6 +104,7 @@ class PaymentOrderController extends Controller
         }
         $payment_order = PaymentOrder::create(
             [
+                'id' => $request->id,
                 'user_id' => $request->user_id,
                 'company_name' => $request->company_name,
                 'jpy' => $request->jpy,
@@ -110,14 +112,24 @@ class PaymentOrderController extends Controller
                 'usd' => $request->usd,
                 'exchange_rate_id' => $request->exchange_rate_id,
                 'payment_date' => $request->payment_date,
+                'created_at' => $request->created_at,
+                'updated_at' => $request->updated_at,
+                'deleted_at' => $request->deleted_at,
             ]
         );
+        $payment_order->save();
         if ($payment_order) {
             return response()->json([
                 'success' => true,
                 'message' => 'Create payment_order successfully',
                 'payment_order' => $payment_order
             ], 200);
+        }
+        else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Create payment_order failed',
+            ], 404);
         }
 
         return response()->json([
@@ -146,6 +158,7 @@ class PaymentOrderController extends Controller
             $new_payment_order = request()->all();
             $payment_order_id = request()->route('id');
             $payment_order = PaymentOrder::find($payment_order_id);
+            $payment_order->save();
             if ($payment_order){
                 $payment_order->update($new_payment_order);
                 return response()->json([
@@ -170,9 +183,10 @@ class PaymentOrderController extends Controller
     public function delete_payment_order(Request $request)
     {
         $payment_order_id = request()->route('id');
-        $payment_order = PaymentOrder::find($payment_order_id);
+        $payment_order = PaymentOrder::findOrFail($payment_order_id);
         if ($payment_order) {
-            $payment_order->delete();
+            $payment_order->deleted_at = now();
+            $payment_order->save();
             return response()->json([
                 'success' => true,
                 'message' => 'Delete payment_order successfully',
