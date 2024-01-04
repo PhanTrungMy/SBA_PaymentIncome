@@ -41,6 +41,7 @@ Route::group([
         'verifyToken',
     ],
 ], function () {
+    // groups all
     Route::post('/categories', [CategoryController::class, 'catogory_create']);
     Route::get('/categories', [CategoryController::class, 'catogory_show_all']);
     Route::get('/categories/{id}', [CategoryController::class, 'catogory_show_id']);
