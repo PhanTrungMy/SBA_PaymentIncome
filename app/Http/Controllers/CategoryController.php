@@ -18,7 +18,8 @@ class CategoryController extends Controller
             $groupId = $request->query('group_id');
             $reportType = $request->query('report_type');
 
-            $query = Category::with('group');
+            $query = Category::with('group')->whereNull('deleted_at');
+
             if (!empty($name)) {
                 $query->where('name', 'like', "%{$name}%");
             }
@@ -66,6 +67,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function catogory_show_id($id)
     {
         try {
@@ -77,7 +79,12 @@ class CategoryController extends Controller
                     "message" => "Category not found"
                 ], 400);
             }
-
+            if (!is_null($category->deleted_at)) {
+                return response()->json([
+                    "success" => false,
+                    "message" => "Category not found"
+                ], 400);
+            }
             return response()->json([
                 "success" => true,
                 "message" => "Get category successfully",
@@ -90,6 +97,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function catogory_create(Request $request)
     {
         try {
@@ -169,8 +177,7 @@ class CategoryController extends Controller
             }
 
             $category = Category::find($id);
-
-            if (!$category) {
+            if (!$category || !is_null($category->deleted_at)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Category not found'
@@ -201,12 +208,14 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
     public function catogory_delete($id)
     {
         try {
             $category = Category::find($id);
 
-            if (!$category) {
+
+            if (!$category || !is_null($category->deleted_at)) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Category not found'
@@ -221,20 +230,19 @@ class CategoryController extends Controller
                 ], 409);
             }
 
-            $deletedCategory = clone $category;
-            $category->delete();
+            $category->deleted_at = now();
+            $category->save();
 
             return response()->json([
                 'success' => true,
                 'message' => 'Deleted category successfully',
                 'category' => [
-                    'id' => $deletedCategory->id,
-                    'name' => $deletedCategory->name,
-                    'group_id' => $deletedCategory->group_id,
-                    'is_update' => 0,
-                    'created_at' => $deletedCategory->created_at->toDateTimeString(),
-                    'updated_at' => $deletedCategory->updated_at->toDateTimeString(),
-                    'deleted_at' => now()->toDateTimeString()
+                    'id' => $category->id,
+                    'name' => $category->name,
+                    'group_id' => $category->group_id,
+                    'created_at' => $category->created_at->toDateTimeString(),
+                    'updated_at' => $category->updated_at->toDateTimeString(),
+                    'deleted_at' => $category->deleted_at->toDateTimeString()
                 ]
             ], 200);
         } catch (Exception $e) {
