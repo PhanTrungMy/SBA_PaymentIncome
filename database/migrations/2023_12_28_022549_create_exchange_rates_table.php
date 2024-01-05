@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('exchange_rates', function (Blueprint $table) {
             $table->id();
-            $table->float('jpn');
-            $table->float('usd');
+            $table->decimal('jpn', 20, 4);
+            $table->decimal('usd', 20,4);
             $table->string('exchange_rate_month', 100)->nullable();
             $table->timestamps();
             $table->softDeletes();
