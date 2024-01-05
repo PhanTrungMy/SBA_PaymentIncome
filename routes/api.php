@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -37,17 +38,14 @@ Route::group([
     Route::post("logout", [AuthController::class, "logout"])->name('logout');
 });
 Route::group([
+    'prefix' => 'groups',
     'middleware' => [
         'checkLogin',
         'verifyToken',
     ],
 ], function () {
     // groups all
-    Route::post('/categories', [CategoryController::class, 'catogory_create']);
-    Route::get('/categories', [CategoryController::class, 'catogory_show_all']);
-    Route::get('/categories/{id}', [CategoryController::class, 'catogory_show_id']);
-    Route::put('/categories/{id}', [CategoryController::class, 'catogory_update']);
-    Route::delete('/categories/{id}', [CategoryController::class, 'catogory_delete']);
+    Route::get('', [GroupController::class, 'get_all_groups'])->name('groups');
 });
 Route::group([
     'prefix' => 'payment_orders',
@@ -81,16 +79,19 @@ Route::group([
 ], function () {
     // payments
     Route::post('', [PaymentController::class, "create_payments"])->name('create_payments');
+    Route::put('{id}', [PaymentController::class, "update_payments"])->name('update_payments');
+    Route::delete('{id}', [PaymentController::class, "delete_payments"])->name('delete_payments');
 
 });
 Route::group([
-    'prefix' => 'payment_orders',
+    'prefix' => 'payments',
     'middleware' => [
         'checkLogin',
         'verifyToken'
     ],
 ], function () {
     //payments Id
+    Route::get("{id}", [PaymentController::class, "paymentsId"])->name('payments_id');
 
 });
 
