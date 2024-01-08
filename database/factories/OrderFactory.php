@@ -20,7 +20,11 @@ class OrderFactory extends Factory
             'company_name' => $this->faker->company,
             'jpy' => $this->faker->randomFloat(2, 1000, 10000), // Example range for JPY
             'usd' => $this->faker->randomFloat(2, 500, 5000), // Example range for USD
+<<<<<<< HEAD
             'vnd' => $this->faker->randomFloat(2, 100, 5000),
+=======
+            'vnd' => $this->faker->randomFloat(2, 100, 1000), // Example range for VND
+>>>>>>> b2546537a43569cb6861c02ac42097528d349cc1
             'exchange_rate_id' => ExchangeRate::factory(),
             'order_date' => $this->faker->dateTimeBetween('-1 year', 'now'), 
         ];

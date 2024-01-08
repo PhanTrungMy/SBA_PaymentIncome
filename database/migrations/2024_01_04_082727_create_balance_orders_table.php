@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('exchange_rates', function (Blueprint $table) {
-            $table->id();
-            $table->decimal('jpn', 20, 4);
-            $table->decimal('usd', 20,4);
-            $table->string('exchange_rate_month', 100)->nullable();
+        Schema::create('balance_sheets', function (Blueprint $table) {
+            $table->bigIncrements('id');
+            $table->decimal('amount', 20, 4);
+            $table->string('bs_month_year', 50);
+            $table->unsignedBigInteger('category_id');
             $table->timestamps();
             $table->softDeletes();
+            $table->foreign('category_id')->references('id')->on('categories');
+        
         });
     }
 
@@ -26,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('exchange_rates');
+        Schema::dropIfExists('balance_sheets');
     }
 };

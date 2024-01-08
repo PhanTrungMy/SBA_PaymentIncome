@@ -157,7 +157,7 @@ class PaymentOrderController extends Controller
             }
             $new_payment_order = request()->all();
             $payment_order_id = request()->route('id');
-            $payment_order = PaymentOrder::find($payment_order_id);
+            $payment_order = PaymentOrder::findOrFail($payment_order_id);
             $payment_order->save();
             if ($payment_order){
                 $payment_order->update($new_payment_order);

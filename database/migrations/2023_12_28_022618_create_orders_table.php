@@ -15,9 +15,15 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('company_name', 255);
+<<<<<<< HEAD
             $table->float('jpy')->nullable();
             $table->float('usd')->nullable();
             $table->float("vnd")->nullable();
+=======
+            $table->decimal('jpy', 20, 4)->nullable();
+            $table->decimal('usd', 20, 4)->nullable();
+            $table->decimal('vnd', 20, 4)->nullable();
+>>>>>>> b2546537a43569cb6861c02ac42097528d349cc1
             $table->unsignedBigInteger('exchange_rate_id');
             $table->dateTime('order_date')->nullable();
             $table->timestamps();
