@@ -13,7 +13,11 @@ class Order extends Model
         'company_name',
         'jpy',
         'usd',
+<<<<<<< HEAD
+        "vnd",
+=======
         'vnd',
+>>>>>>> b2546537a43569cb6861c02ac42097528d349cc1
         'exchange_rate_id',
         'order_date',
     ];
