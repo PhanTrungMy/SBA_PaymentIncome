@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PaymentOrderController;
 use App\Http\Controllers\OutsourcingController;
 /*
 |--------------------------------------------------------------------------
