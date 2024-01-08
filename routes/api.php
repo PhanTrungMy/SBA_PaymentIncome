@@ -10,7 +10,7 @@ use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentOrderController;
-
+use App\Http\Controllers\OutsourcingController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -53,7 +53,7 @@ Route::group([
     'prefix' => 'payment_orders',
     'middleware' => [
         'checkLogin',
-         'verifyToken',
+        'verifyToken',
     ],
 ], function () {
     // payment_orders
@@ -76,14 +76,13 @@ Route::group([
     'prefix' => 'payments',
     'middleware' => [
         'checkLogin',
-         'verifyToken',
+        'verifyToken',
     ],
 ], function () {
     // payments
     Route::post('', [PaymentController::class, "create_payments"])->name('create_payments');
     Route::put('{id}', [PaymentController::class, "update_payments"])->name('update_payments');
     Route::delete('{id}', [PaymentController::class, "delete_payments"])->name('delete_payments');
-
 });
 Route::group([
     'prefix' => 'payments',
@@ -94,14 +93,13 @@ Route::group([
 ], function () {
     //payments Id
     Route::get("{id}", [PaymentController::class, "paymentsId"])->name('payments_id');
-
 });
 
 Route::group([
     'prefix' => 'categories',
     'middleware' => [
         'checkLogin',
-         'verifyToken',
+        'verifyToken',
     ],
 ], function () {
     // categories
@@ -126,4 +124,17 @@ Route::group([
     Route::put('{id}', [OrderController::class, 'Update_Order']);
     Route::delete('{id}', [OrderController::class, 'Delete_Order']);
 });
-
+Route::group([
+    'prefix' => 'outsourcing',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // outsourcing
+    Route::get('', [OutsourcingController::class, 'show_all_outsourcing']);
+    Route::get('{id}', [OutsourcingController::class, 'show_id_outsourcing']);
+    Route::post('', [OutsourcingController::class, 'create_outsourcing']);
+    Route::put('{id}', [OutsourcingController::class, 'update_sourcing']);
+    Route::delete('{id}', [OutsourcingController::class, 'delete_sourcing']);
+});
