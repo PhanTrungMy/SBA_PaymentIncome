@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentOrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnalyticsController;
@@ -107,5 +109,20 @@ Route::group([
     Route::get('{id}', [CategoryController::class, 'catogory_show_id']);
     Route::put('{id}', [CategoryController::class, 'catogory_update']);
     Route::delete('{id}', [CategoryController::class, 'catogory_delete']);
+});
+
+Route::group([
+    'prefix' => 'orders',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // categories
+    Route::get('', [OrderController::class, 'Get_all_order']);
+    Route::get('{id}', [OrderController::class, 'Get_Order_By_ID']);
+    Route::post('', [OrderController::class, 'Create_Order']);
+    Route::put('{id}', [OrderController::class, 'Update_Order']);
+    Route::delete('{id}', [OrderController::class, 'Delete_Order']);
 });
 
