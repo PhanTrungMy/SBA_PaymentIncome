@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\OrderController;
@@ -136,4 +137,15 @@ Route::group([
     Route::post('', [OutsourcingController::class, 'create_outsourcing']);
     Route::put('{id}', [OutsourcingController::class, 'update_sourcing']);
     Route::delete('{id}', [OutsourcingController::class, 'delete_sourcing']);
+});
+Route::group([
+    'prefix' => 'analytics',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // outsourcing
+    Route::get('', [AnalyticController::class, 'category_analytics']);
+
 });

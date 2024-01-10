@@ -11,7 +11,7 @@ class ExchangeRate extends Model
     protected $fillable = [
         'jpy',
         'usd',
-        'exchange_rate_date',
+        'exchange_rate_month',
     ];
     public function payments(){
         return $this->belongsTo(Payment::class);
@@ -25,4 +25,5 @@ class ExchangeRate extends Model
     public function outsourcing(){
         return $this->belongsTo(Outsourcing::class);
     }
+
 }
