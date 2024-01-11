@@ -27,36 +27,32 @@ class AuthController extends Controller
         }
  
         if (! $token = auth('api')->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'username or password is not correct'], 401);
         }
         return $this->createNewToken($token);
     }
+    public function refresh() {
+        return $this->createNewToken(auth('api')->refresh());
+    }
+
     public function logout()
     {
-        $user = Auth::user();
-
-        if (!$user) {
-            return response()->json([
-                'success' => false,
-                'message' => 'User is not logged in',
-            ], 400);
-        }
-
         Auth::logout();
 
         return response()->json([
             'message' => 'Logged out successfully',
         ], 200);
     }
-   protected function createNewToken($token){
-
+protected function createNewToken($token)
+{
+    $user = auth('api')->user();
+    $user->makeHidden(['created_at', 'updated_at']);
     return response()->json([
+        'massage' => 'Login successfully',
         'access_token' => $token,
         'token_type' => 'bearer',
-        'expires_in' => auth('api')->factory()->getTTL() * 60,
-        'user' =>auth('api')->user()
+        'expires_in' => auth('api')->factory()->getTTL() * 60 * 24, // Increase the time by multiplying with 24 (for 24 hours)
+        'user' => auth('api')->user()
     ]);
-
-
-}
+}  
 }
