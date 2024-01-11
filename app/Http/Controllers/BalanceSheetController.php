@@ -10,17 +10,28 @@ class BalanceSheetController extends Controller
 {
     public function balance_create(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
             'month_year' => 'required|date_format:Y-m',
             'balances' => 'required|array',
             'balances.*.amount' => 'required|numeric',
             'balances.*.category_id' => 'required|integer|exists:categories,id'
+        ], [
+            'month_year.date_format' => 'month_year is invalid',
         ]);
 
         if ($validator->fails()) {
+            $errorMessage = collect($validator->errors())->map(function ($errors, $field) {
+                return str_replace(
+                    'balances.0.',
+                    '',
+                    $errors[0]
+                );
+            })->first();
+
             return response()->json([
                 'success' => false,
-                'message' => $validator->errors()->first()
+                'message' => $errorMessage
             ], 400);
         }
 
@@ -37,6 +48,8 @@ class BalanceSheetController extends Controller
             'message' => 'Create balance_sheets successfully'
         ], 200);
     }
+
+
     public function balance_get(Request $request)
     {
         try {

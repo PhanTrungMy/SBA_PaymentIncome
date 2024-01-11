@@ -14,6 +14,7 @@ class Outsourcing extends Model
         'company_name',
         'jpy',
         'usd',
+        'vnd',
         'exchange_rate_id',
         'outsourced_project',
         'outsourced_date',

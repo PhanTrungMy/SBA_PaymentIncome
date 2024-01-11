@@ -13,10 +13,11 @@ class CategoryController extends Controller
     public function catogory_show_all(Request $request)
     {
         try {
-            $perPage = $request->query('per_page', 10);
-            $name = $request->query('name');
-            $groupId = $request->query('group_id');
-            $reportType = $request->query('report_type');
+            // Lấy dữ liệu từ request body
+            $perPage = $request->input('per_page', 10);
+            $name = $request->input('name');
+            $groupId = $request->input('group_id');
+            $reportType = $request->input('report_type');
 
             $query = Category::with('group')->whereNull('deleted_at');
 
@@ -67,6 +68,7 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
 
     public function catogory_show_id($id)
     {
