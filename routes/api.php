@@ -7,7 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentOrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OutsourcingController;
@@ -147,5 +147,15 @@ Route::group([
 ], function () {
     // outsourcing
     Route::get('', [AnalyticController::class, 'category_analytics']);
-
+});
+Route::group([
+    'prefix' => 'balances',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    //balance
+    Route::post('', [BalanceSheetController::class, 'balance_create']);
+    Route::get('', [BalanceSheetController::class, 'balance_get']);
 });
