@@ -137,8 +137,8 @@ Route::group([
     Route::get('', [OutsourcingController::class, 'show_all_outsourcing']);
     Route::get('{id}', [OutsourcingController::class, 'show_id_outsourcing']);
     Route::post('', [OutsourcingController::class, 'create_outsourcing']);
-    Route::put('{id}', [OutsourcingController::class, 'update_sourcing']);
-    Route::delete('{id}', [OutsourcingController::class, 'delete_sourcing']);
+    Route::put('{id}', [OutsourcingController::class, 'update_outsourcing']);
+    Route::delete('{id}', [OutsourcingController::class, 'delete_outsourcing']);
 });
 Route::group([
     'prefix' => 'analytics',
@@ -171,5 +171,3 @@ Route::group([
     // outsourcing
     Route::get('', [DataTableController::class, 'get_data_table']);
 });
-
-
