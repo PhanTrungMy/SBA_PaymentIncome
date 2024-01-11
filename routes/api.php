@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DataTableController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OutsourcingController;
 /*
@@ -30,6 +31,7 @@ Route::group([
     'middleware' => 'api',
 ], function ($router) {
     Route::post('login', [AuthController::class, 'login']);
+    Route::post('refresh', [AuthController::class, "refresh"]);
 });
 Route::group([
     'prefix' => 'auth',
@@ -147,5 +149,16 @@ Route::group([
 ], function () {
     // outsourcing
     Route::get('', [AnalyticController::class, 'category_analytics']);
-
 });
+Route::group([
+    'prefix' => 'getData',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // outsourcing
+    Route::get('', [DataTableController::class, 'get_data_table']);
+});
+
+

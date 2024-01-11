@@ -55,7 +55,7 @@ class PaymentOrderController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Get payment_orders successfully',
+            'message' => 'Get all payment_orders successfully',
             'total_result' => $totalPaymentOrder,
             'pagination' => $pagination,
             'payment_orders' => $resultPayments
