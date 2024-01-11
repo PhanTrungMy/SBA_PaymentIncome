@@ -13,6 +13,7 @@ class PaymentOrderController extends Controller
     {
         $resultPayments = [];
         $perPage = $request->query('per_page') ?? 5;
+        $perPage = in_array($perPage, [ 5,10, 20]) ? $perPage : 5;
         $curPage = $request->query('cur_page') ?? 1;
         $payment_order = DB::select("
         SELECT `id`,`user_id`, `company_name`,`jpy`,`vnd`,`usd`,`exchange_rate_id`,`payment_date`, `created_at`, `updated_at`, `deleted_at`
@@ -69,7 +70,7 @@ class PaymentOrderController extends Controller
         if ($payment_order == null) {
             return response()->json([
                 "success" => false,
-                "message" => "Payment_order not found",
+                "message" => "Payment_orders not found",
             ], 404);
         }
         if (!$payment_order) {
@@ -97,11 +98,17 @@ class PaymentOrderController extends Controller
             'payment_date' => 'required',
         ]);
         if ($validatedData->fails()) {
+            $errors = $validatedData->errors();
+            $errorMessage = [];
+            foreach ($errors->all() as $error) {
+                $errorMessage[] = $error;
+            }
             return response()->json([
-                'status' => 'error',
-                'message' => $validatedData->errors()
+                'success' => false,
+                'message' => implode(', ', $errorMessage)
             ], 400);
         }
+    
         $payment_order = PaymentOrder::create(
             [
                 'id' => $request->id,
@@ -121,7 +128,7 @@ class PaymentOrderController extends Controller
         if ($payment_order) {
             return response()->json([
                 'success' => true,
-                'message' => 'Create payment_order successfully',
+                'message' => 'Create payment_orders successfully',
                 'payment_order' => $payment_order
             ], 200);
         }
@@ -134,7 +141,7 @@ class PaymentOrderController extends Controller
 
         return response()->json([
             'success' => false,
-            'message' => 'Server error'
+            'message' => 'Internal server error"'
         ], 500);
 
     }
@@ -150,9 +157,14 @@ class PaymentOrderController extends Controller
                 'payment_date' => 'required',
             ]);
             if ($validated->fails()) {
+                $errors = $validated->errors();
+                $errorMessage = [];
+                foreach ($errors->all() as $error) {
+                    $errorMessage[] = $error;
+                }
                 return response()->json([
-                    'status' => 'error',
-                    'message' => $validated->errors()
+                    'success' => false,
+                    'message' => implode(', ', $errorMessage)
                 ], 400);
             }
             $new_payment_order = request()->all();
@@ -200,7 +212,7 @@ class PaymentOrderController extends Controller
         }
         return response()->json([
             'success' => false,
-            'message' => 'Server error'
+            'message' => 'Internal server error'
         ], 500);
     }
 }

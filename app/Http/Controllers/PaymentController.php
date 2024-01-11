@@ -24,9 +24,14 @@ class PaymentController extends Controller
 
         ]);
         if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errorMessage = [];
+            foreach ($errors->all() as $error) {
+                $errorMessage[] = $error;
+            }
             return response()->json([
-                'status' => 'error',
-                'message' => $validator->errors()
+                'success' => false,
+                'message' => implode(', ', $errorMessage)
             ], 400);
         }
         $payment = Payment::create(
@@ -49,13 +54,13 @@ class PaymentController extends Controller
         if ($payment) {
             return response()->json([
                 'success' => true,
-                'message' => 'Create payment successfully',
+                'message' => 'Create new payment successfully',
                 'payment' => $payment
             ], 200);
         } else {
             return response()->json([
                 'success' => false,
-                'message' => 'Create payment failed',
+                'message' => 'Fields are not proper',
             ], 404);
         }
         return response()->json([
@@ -98,16 +103,21 @@ class PaymentController extends Controller
 
         ]);
         if ($validator->fails()) {
+            $errors = $validator->errors();
+            $errorMessage = [];
+            foreach ($errors->all() as $error) {
+                $errorMessage[] = $error;
+            }
             return response()->json([
-                'status' => 'error',
-                'message' => $validator->errors()
+                'success' => false,
+                'message' => implode(', ', $errorMessage)
             ], 400);
         }
         $payment = Payment::findOrFail($id);
         if (!$payment) {
             return response()->json([
                 'success' => false,
-                'message' => 'Not found payment',
+                'message' => 'Fields are not proper',
             ], 404);
         }
         $oldCategoryId = $payment->category_id;
@@ -122,6 +132,7 @@ class PaymentController extends Controller
             'message' => 'Update payment successfully',
             'payment' => $payment
         ], 200);
+        
     }
     public function delete_payments(Request $request, $id)
     {
@@ -134,11 +145,17 @@ class PaymentController extends Controller
         }
         $payment->deleted_at = now();
         $payment->save();
-        Category::where('id', $payment->category_id)->decrement('payment_count');
-        return response()->json([
+        $category = Category::where('id', $payment->category_id)->decrement('payment_count');
+        if( $category){
+            return response()->json([
             'success' => true,
-            'message' => 'Delete payment successfully',
+            'message' => 'Update payment successfully',
             'payment' => $payment
         ], 200);
+        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Internal server error'
+        ], 500);
     }
 }

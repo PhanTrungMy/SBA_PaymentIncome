@@ -12,6 +12,7 @@ class GroupController extends Controller
     {
         $resultGroups = [];
         $perPage = $request->query('per_page') ?? 10;
+        $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
         $curPage = $request->query('page') ?? 1;
         $name = $request->query('name');
         $reportType = $request->query('report_type');

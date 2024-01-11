@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -46,9 +46,9 @@ class AuthController extends Controller
 protected function createNewToken($token)
 {
     $user = auth('api')->user();
-    $user->makeHidden(['created_at', 'updated_at']);
+    $user->makeHidden(['id','created_at', 'updated_at']);
     return response()->json([
-        'massage' => 'Login successfully',
+        'message' => 'User successfully signed in',
         'access_token' => $token,
         'token_type' => 'bearer',
         'expires_in' => auth('api')->factory()->getTTL() * 60 * 24, // Increase the time by multiplying with 24 (for 24 hours)
