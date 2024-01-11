@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\ExchangeRateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,4 +32,16 @@ Route::group([
 ], function ($router) {
     Route::post('login', [AuthController::class, 'login']);
     
+});
+
+Route::group([
+    'prefix' => 'exchangeRate',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    Route::get('{month}/{year}', [ExchangeRateController::class, 'ExchangeRateByMonthYear']);
+    Route::post('', [ExchangeRateController::class, "CreateExchangeRate"]);
+    Route::put('{id}', [ExchangeRateController::class, 'UpdateChangeRate']);
 });
