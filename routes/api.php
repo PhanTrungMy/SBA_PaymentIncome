@@ -2,9 +2,13 @@
 
 use App\Http\Controllers\AnalyticController;
 use App\Http\Controllers\Api\AuthController;
+<<<<<<< HEAD
+use App\Http\Controllers\ExchangeRateController;
+=======
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentOrderController;
+>>>>>>> 937b36329932ab70bb56050cf73516b54faf1332
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BalanceSheetController;
@@ -35,6 +39,16 @@ Route::group([
 });
 Route::group([
     'prefix' => 'auth',
+<<<<<<< HEAD
+     'middleware' => 'api',
+], function ($router) {
+    Route::post('login', [AuthController::class, 'login']);
+    
+});
+
+Route::group([
+    'prefix' => 'exchangeRate',
+=======
     'middleware' => [
         'checkLogin',
     ],
@@ -43,11 +57,18 @@ Route::group([
 });
 Route::group([
     'prefix' => 'groups',
+>>>>>>> 937b36329932ab70bb56050cf73516b54faf1332
     'middleware' => [
         'checkLogin',
         'verifyToken',
     ],
 ], function () {
+<<<<<<< HEAD
+    Route::get('{month}/{year}', [ExchangeRateController::class, 'ExchangeRateByMonthYear']);
+    Route::post('', [ExchangeRateController::class, "CreateExchangeRate"]);
+    Route::put('{id}', [ExchangeRateController::class, 'UpdateChangeRate']);
+});
+=======
     // groups all
     Route::get('', [GroupController::class, 'get_all_groups'])->name('groups');
 });
@@ -171,3 +192,4 @@ Route::group([
     // outsourcing
     Route::get('', [DataTableController::class, 'get_data_table']);
 });
+>>>>>>> 937b36329932ab70bb56050cf73516b54faf1332
