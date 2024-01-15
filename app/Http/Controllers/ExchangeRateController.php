@@ -10,9 +10,15 @@ use Illuminate\Support\Carbon;
 
 class ExchangeRateController extends Controller
 {
-    function ExchangeRateByMonthYear(Request $request, $month, $year)
+    function ExchangeRateByMonthYear(Request $request)
     {
-        $check_by_month = ExchangeRate::whereRaw('YEAR(exchange_rate_month) = ? AND MONTH(exchange_rate_month) = ?', [$year, $month])->select(["jpn", "usd", "id as exchange_rate_id"])->get();
+        $month = $request["month"];
+        $year = $request["year"];
+        $month_and_year = $year . "-" . $month;
+        $check_by_month = DB::table("exchange_rates")->where("exchange_rate_month", $month_and_year)
+        ->select(["jpy", "usd", "id as exchange_rate_id"])
+        ->get();
+
         if ($check_by_month != null or $check_by_month == null) {
             return response()->json([
                 "success" => True,
@@ -30,17 +36,17 @@ class ExchangeRateController extends Controller
     {
         $exchangeDate = $request["exchangeDate"];
         $formattedDate = Carbon::createFromFormat('m-Y', $exchangeDate)->format('Y-m');
-        $jpn = $request["jpn"];
+        $jpy = $request["jpy"];
         $usd = $request["usd"];
         $exchangeRate = Validator::make($request->all(), [
             "exchangeDate" => "nullable|string",
-            "jpn" => "required|numeric|regex:/^\d+(\.\d{1,2})?$/",
+            "jpy" => "required|numeric|regex:/^\d+(\.\d{1,2})?$/",
             "usd" => "required|numeric|regex:/^\d+(\.\d{1,2})?$/"
         ], [
-            "jpn.required" => "jpn is required",
-            "jpn.numeric" => "jpn is numeric",
+            "jpy.required" => "jpy is required",
+            "jpy.numeric" => "jpy is numeric",
             "usd.numeric" => "usd is numeric",
-            "jpn.regex" => "jpn is decimal",
+            "jpy.regex" => "jpy is decimal",
             "usd.regex" => "usd is decimal"
         ]);
         if ($exchangeRate->fails()) {
@@ -51,7 +57,7 @@ class ExchangeRateController extends Controller
         } else {
             try {
                 DB::table("exchange_rates")->insert([
-                    "jpn" => $jpn,
+                    "jpy" => $jpy,
                     "usd" => $usd,
                     "exchange_rate_month" => $formattedDate
                 ]);
@@ -59,7 +65,7 @@ class ExchangeRateController extends Controller
                     "success" => true,
                     "message" => "create exchange rate successfully",
                     "exchangeDate" => $exchangeDate,
-                    "jpn" => $jpn,
+                    "jpy" => $jpy,
                     "usd" => $usd,
                 ], 200);
             } catch (\Exception $e) {
@@ -75,17 +81,17 @@ class ExchangeRateController extends Controller
         $check_id = DB::table("exchange_rates")->where("id", $id)->first();
         $exchangeDate = $request["exchangeDate"];
         $formattedDate = Carbon::createFromFormat('m-Y', $exchangeDate)->format('Y-m');
-        $jpn = $request["jpn"];
+        $jpy = $request["jpy"];
         $usd = $request["usd"];
         $exchangeRate = Validator::make($request->all(), [
             "exchangeDate" => "nullable|string",
-            "jpn" => "required|numeric|regex:/^\d+(\.\d{1,2})?$/",
+            "jpy" => "required|numeric|regex:/^\d+(\.\d{1,2})?$/",
             "usd" => "required|numeric|regex:/^\d+(\.\d{1,2})?$/"
         ], [
-            "jpn.required" => "jpn is required",
-            "jpn.numeric" => "jpn is numeric",
+            "jpy.required" => "jpy is required",
+            "jpy.numeric" => "jpy is numeric",
             "usd.numeric" => "usd is numeric",
-            "jpn.regex" => "jpn is decimal",
+            "jpy.regex" => "jpy is decimal",
             "usd.regex" => "usd is decimal"
         ]);
         if ($exchangeRate->fails()) {
@@ -97,7 +103,7 @@ class ExchangeRateController extends Controller
             try {
                 if ($check_id != null) {
                     DB::table("exchange_rates")->update([
-                        "jpn" => $jpn,
+                        "jpy" => $jpy,
                         "usd" => $usd,
                         "exchange_rate_month" => $formattedDate
                     ]);
@@ -105,7 +111,7 @@ class ExchangeRateController extends Controller
                         "success" => true,
                         "message" => "update exchange rate successfully",
                         "exchangeDate" => $exchangeDate,
-                        "jpn" => $jpn,
+                        "jpy" => $jpy,
                         "usd" => $usd,
                     ], 200);
                 } else {

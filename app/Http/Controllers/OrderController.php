@@ -15,14 +15,18 @@ class OrderController extends Controller
             $Get_all = DB::table("orders")->where("deleted_at", null)->get();
             $Get_All_paginator = DB::table("orders")->where("deleted_at", null)->paginate(10);
 
+            $total = $request["total"];
+            $perPage = $request["perPage"];
+            $currentPage = $request["currentPage"];
+
             if ($Get_All_paginator->count() > 0) {
                 return response()->json([
                     "success" => true,
                     "message" => "Get all order successfully",
-                    "total_results" => $Get_All_paginator->total(),
-                    "paginator" => [
-                        "per_page" => $Get_All_paginator->perPage(),
-                        "current_page" => $Get_All_paginator->currentPage(),
+                    "total_results" =>$total, // $Get_All_paginator->total(),
+                    "pagination" => [
+                        "per_page" => $perPage, //$Get_All_paginator->perPage(),
+                        "current_page" => $currentPage, //$Get_All_paginator->currentPage(),
                         "total_pages" => $Get_All_paginator->lastPage(),
                     ],
                     "orders" => $Get_all,
@@ -87,7 +91,7 @@ class OrderController extends Controller
 
         $check_user_id = DB::table("users")->where("id", $user_id)->get();
         $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->get();
-        $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpn);
+        $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
         $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
 
         if ($check_user_id != null) {
@@ -150,7 +154,7 @@ class OrderController extends Controller
         ]);
         $check_user_id = DB::table("users")->where("id", $user_id)->get();
         $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->get();
-        $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpn);
+        $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
         $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
 
         if ($check_user_id != null) {
