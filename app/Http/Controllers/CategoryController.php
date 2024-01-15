@@ -13,14 +13,13 @@ class CategoryController extends Controller
     public function catogory_show_all(Request $request)
     {
         try {
+            $resultCategory = [];
             // Lấy dữ liệu từ request body
             $perPage = $request->input('per_page', 10);
             $name = $request->input('name');
             $groupId = $request->input('group_id');
             $reportType = $request->input('report_type');
-
-            $query = Category::with('group')->whereNull('deleted_at');
-
+            $query = Category::where('deleted_at', null);
             if (!empty($name)) {
                 $query->where('name', 'like', "%{$name}%");
             }
@@ -36,30 +35,27 @@ class CategoryController extends Controller
             }
 
             $categories = $query->paginate($perPage);
-
-            $transformedCategories = $categories->getCollection()->transform(function ($category) {
-                return [
+            foreach ($categories as $category) {
+                $resultCategory[] = [
                     'id' => $category->id,
                     'name' => $category->name,
                     'group_id' => $category->group_id,
                     'payment_count' => $category->payment_count,
                     'created_at' => $category->created_at->toDateTimeString(),
-                    'updated_at' => $category->updated_at->toDateTimeString(),
-                    'deleted_at' => $category->deleted_at ? $category->deleted_at->toDateTimeString() : null,
-                    'report_type' => $category->group ? $category->group->report_type : null,
+                    'updated_at' => $category->updated_at->toDateTimeString()
                 ];
-            });
-
+            }
+            $pagination = [
+                'per_page' => $categories->perPage(),
+                'current_page' => $categories->currentPage(),
+                'total_pages' => $categories->lastPage(),
+            ];
             return response()->json([
                 'success' => true,
                 'message' => 'Get all categories successfully',
                 'total_result' => $categories->total(),
-                'pagination' => [
-                    'per_page' => $categories->perPage(),
-                    'current_page' => $categories->currentPage(),
-                    'total_pages' => $categories->lastPage(),
-                ],
-                'categories' => $transformedCategories
+                'pagination' => $pagination,
+                'categories' => $resultCategory
             ], 200);
         } catch (Exception $e) {
             return response()->json([
@@ -68,7 +64,6 @@ class CategoryController extends Controller
             ], 500);
         }
     }
-
 
     public function catogory_show_id($id)
     {
