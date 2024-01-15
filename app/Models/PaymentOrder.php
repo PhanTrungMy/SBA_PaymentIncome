@@ -13,6 +13,7 @@ class PaymentOrder extends Model
         'user_id',
         'company_name',
         'jpy',
+        'vnd',
         'usd',
         'exchange_rate_id',
         'payment_date',

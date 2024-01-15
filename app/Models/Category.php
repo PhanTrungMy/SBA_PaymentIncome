@@ -11,8 +11,9 @@ class Category extends Model
     use HasFactory,SoftDeletes;
     protected $fillable = [ 
         'name',
-        'description',
-        'group_id'
+        'group_id',
+        'payment_count',
+        
     ];
     public function group(){
         return $this->belongsTo(Group::class);
