@@ -4,14 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ExchangeRate extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
     protected $fillable = [
         'jpy',
         'usd',
-        'exchange_rate_date',
+        'exchange_rate_month',
     ];
     public function payments(){
         return $this->belongsTo(Payment::class);
@@ -25,4 +26,5 @@ class ExchangeRate extends Model
     public function outsourcing(){
         return $this->belongsTo(Outsourcing::class);
     }
+
 }

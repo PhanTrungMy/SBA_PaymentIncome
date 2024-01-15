@@ -6,16 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Group extends Model
+class BalanceSheet extends Model
 {
     use HasFactory,SoftDeletes;
     protected $fillable = [
-        'name',
-        'reportType',
-      
+        'amount',
+        'bs_month_year',
+        'category_id',
     ];
-    public function categories()
+    public function category()
     {
-        return $this->hasMany(Category::class);
+        return $this->belongsTo(Category::class);
     }
 }
