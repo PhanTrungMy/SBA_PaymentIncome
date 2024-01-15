@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
          ExchangeRateSeeder::class,
          PaymentOrderSeeder::class,
          OutsourcingSeeder::class,
-
+         BalanceSheepSeeder::class
         ]);
     }
 }

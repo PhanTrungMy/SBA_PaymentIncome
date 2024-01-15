@@ -22,14 +22,15 @@ class AnalyticController extends Controller
                 'message' => $validated->errors()
             ], 400);
         }
-      
+        
         $found_id = ExchangeRate::where('exchange_rate_month', $request->date)->first();
         if (!$found_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Exchange rate not found',
+                'message' => 'Data not found',
             ], 404);
         }
+        return $found_id;
         $categories = DB::select('SELECT 
           categories.id,
           categories.name,
@@ -38,6 +39,7 @@ class AnalyticController extends Controller
           categories.created_at,
           categories.updated_at,
           categories.deleted_at,
+
           SUM(CASE 
             WHEN currency_type = "jpy" THEN cost
             WHEN currency_type = "usd" THEN cost * er.usd
@@ -49,7 +51,7 @@ class AnalyticController extends Controller
           WHERE exchange_rate_id = ?
           GROUP BY categories.id, categories.name
           ORDER BY cost DESC', [$found_id->id]);
-
+         return $categories;
         if ($categories) {
           return response()->json([
             'success' => true,
