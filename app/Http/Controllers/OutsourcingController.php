@@ -70,15 +70,21 @@ class OutsourcingController extends Controller
                 'jpy' => 'nullable|numeric',
                 'usd' => 'nullable|numeric',
                 'vnd' => 'required|numeric',
-                'exchange_rate_id' => 'nullable|integer',
-                'outsourced_project' => 'nullable|string',
+                'exchange_rate_id' => 'required|integer',
+                'outsourced_project' => 'required|string',
                 'outsourced_date' => 'nullable|date',
             ]);
 
             if ($validator->fails()) {
+                $errors = $validator->getMessageBag()->toArray();
+                $firstErrorField = array_key_first($errors); // Lấy tên trường đầu tiên có lỗi
+
+                // Chuyển đổi tên trường từ snake_case thành text bình thường, không viết hoa
+                $readableFieldName = str_replace('_', ' ', $firstErrorField);
+
                 return response()->json([
                     'success' => false,
-                    'message' => $validator->errors()->first()
+                    'message' => $readableFieldName . ' is required.'
                 ], 400);
             }
 
@@ -99,6 +105,8 @@ class OutsourcingController extends Controller
         }
     }
 
+
+
     public function update_outsourcing(Request $request, $id)
     {
         try {
@@ -108,16 +116,22 @@ class OutsourcingController extends Controller
                 'jpy' => 'nullable|numeric',
                 'usd' => 'nullable|numeric',
                 'vnd' => 'required|numeric',
-                'exchange_rate_id' => 'nullable|integer',
-                'outsourced_project' => 'nullable|string',
+                'exchange_rate_id' => 'required|integer',
+                'outsourced_project' => 'required|string',
                 'outsourced_date' => 'nullable|date',
             ]);
+
             if ($validator->fails()) {
+                $errors = $validator->getMessageBag()->toArray();
+                $firstErrorField = array_key_first($errors);
+                $readableFieldName = str_replace('_', ' ', $firstErrorField);
+
                 return response()->json([
                     'success' => false,
-                    'message' => $validator->errors()->first()
+                    'message' => $readableFieldName . ' is required.'
                 ], 400);
             }
+
             $outsourcing = Outsourcing::find($id);
 
             if (!$outsourcing) {
@@ -142,6 +156,7 @@ class OutsourcingController extends Controller
             ], 500);
         }
     }
+
     public function delete_outsourcing($id)
     {
         try {
@@ -159,7 +174,7 @@ class OutsourcingController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Deleted outsourcing successfully',
+                'message' => 'Update outsourcing successfully',
                 'outsourcing' => [
                     'id' => $deletedOutsourcing->id,
                     'user_id' => $deletedOutsourcing->user_id,
