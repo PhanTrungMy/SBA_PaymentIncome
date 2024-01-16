@@ -16,7 +16,6 @@ class PaymentOrderController extends Controller
             $resultPayments = [];
             $perPage = $request->query('per_page') ?? 5;
             $perPage = in_array($perPage, [5, 10, 20]) ? $perPage : 5;
-            $curPage = $request->query('page') ?? 1;
             $query = PaymentOrder::where('deleted_at', null);
             $payment_order = $query->paginate($perPage);
             foreach ($payment_order as $payment) {

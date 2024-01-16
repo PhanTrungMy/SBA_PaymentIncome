@@ -10,22 +10,26 @@ use Illuminate\Support\Carbon;
 
 class ExchangeRateController extends Controller
 {
-    function ExchangeRateByMonthYear(Request $request, $month, $year)
-    {
-        $check_by_month = ExchangeRate::whereRaw('YEAR(exchange_rate_month) = ? AND MONTH(exchange_rate_month) = ?', [$year, $month])->select(["jpn", "usd", "id as exchange_rate_id"])->get();
-        if ($check_by_month != null or $check_by_month == null) {
+        function ExchangeRateByMonthYear(Request $request)
+        {
+            $month = $request["month"];
+            $year = $request["year"];
+            $month_and_year = $year . "-" . $month;
+            $check_by_month_or_year = DB::table("exchange_rates");
+            if ($month != null && $year != null) {
+                $check_by_month_or_year->where("exchange_rate_month", "LIKE", "%$month_and_year%");
+            }
             return response()->json([
                 "success" => True,
                 "message" => "get exchange rates successfully",
-                "data" => $check_by_month
+                "data" => $check_by_month_or_year->get()
             ], 200);
-        } else {
-            return response()->json([
-                "success" => false,
-                "message" => "Internal server error"
-            ], 500);
+                return response()->json([
+                    "success" => false,
+                    "message" => "Internal server error"
+                ], 500);     
         }
-    }
+    
     function CreateExchangeRate(Request $request)
     {
         $exchangeDate = $request["exchangeDate"];

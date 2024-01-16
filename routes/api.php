@@ -2,15 +2,14 @@
 
 use App\Http\Controllers\AnalyticController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\ExchangeRateController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentOrderController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DataTableController;
+use App\Http\Controllers\ExchangeRateController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OutsourcingController;
 /*
@@ -83,6 +82,7 @@ Route::group([
     ],
 ], function () {
     // payments
+    Route::get('', [PaymentController::class, "get_all_payments"])->name('get_payments');
     Route::post('', [PaymentController::class, "create_payments"])->name('create_payments');
     Route::put('{id}', [PaymentController::class, "update_payments"])->name('update_payments');
     Route::delete('{id}', [PaymentController::class, "delete_payments"])->name('delete_payments');
@@ -172,13 +172,13 @@ Route::group([
     Route::get('', [DataTableController::class, 'get_data_table']);
 });
 Route::group([
-    'prefix' => 'exchangRate',
+    'prefix' => 'exchangeRate',
     'middleware' => [
         'checkLogin',
         'verifyToken',
     ],
 ], function () {
-    // ExchangRate
+    // ExchangeRate
     Route::get('', [ExchangeRateController::class, 'ExchangeRateByMonthYear']);
     Route::post('', [ExchangeRateController::class, "CreateExchangeRate"]);
     Route::put('{id}', [ExchangeRateController::class, 'UpdateChangeRate']);
