@@ -5,97 +5,153 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Payment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class PaymentController extends Controller
 {
-    public function create_payments(Request $request)
+    public function get_all_payments(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'cost' => 'required',
-            'currency_type' => 'required',
-            'note' => 'required',
-            'invoice' => 'required',
-            'pay' => 'required',
-            'category_id' => 'required',
-            'exchange_rate_id' => 'required',
-            'payment_date' => 'required',
+        try {
+            $resultPayments = [];
+            $perPage = $request->query('per_page') ?? 10;
+            $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
+            $month = $request["month"];
+            $year = $request["year"];
+            $query = Payment::with('Category')
+                ->whereNull('deleted_at')->orderBy('id', 'asc');
 
-        ]);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $errorMessage = [];
-            foreach ($errors->all() as $error) {
-                $errorMessage[] = $error;
+            if ($month && $year) {
+                $query->whereMonth('payment_date', $month)
+                    ->whereYear('payment_date', $year);
             }
-            return response()->json([
-                'success' => false,
-                'message' => implode(', ', $errorMessage)
-            ], 400);
-        }
-        $payment = Payment::create(
-            [
-                'id' => $request->id,
-                'user_id' => $request->user_id,
-                'name' => $request->name,
-                'cost' => $request->cost,
-                'currency_type' => $request->currency_type,
-                'note' => $request->note,
-                'invoice' => $request->invoice,
-                'pay' => $request->pay,
-                'category_id' => $request->category_id,
-                'exchange_rate_id' => $request->exchange_rate_id,
-                'payment_date' => $request->payment_date,
-            ]
-        );
-        Category::where('id', $request->category_id)->increment('payment_count');
-        $payment->save();
-        if ($payment) {
+            $payments = $query->paginate($perPage);
+            foreach ($payments as $payment) {
+                $resultPayments[] = [
+                    "id" => $payment->id,
+                    'user_id' => $payment->user_id,
+                    'name' => $payment->name,
+                    'cost' => $payment->cost,
+                    'currency_type' => $payment->currency_type,
+                    'note' => $payment->note,
+                    'invoice' => $payment->invoice,
+                    'pay' => $payment->pay,
+                    'exchange_rate_id' => $payment->exchange_rate_id,
+                    'payment_date' => $payment->payment_date,
+                    'category' => $resultCategory = [
+                        'id' => $payment->category->id,
+                        'name' => $payment->category->name,
+                        'payment_count' => $payment->category->payment_count,
+                    ],
+                ];
+            }
+            $pagination = [
+                'per_page' => $payments->perPage(),
+                'current_page' => $payments->currentPage(),
+                'total_pages' => $payments->lastPage(),
+            ];
+
             return response()->json([
                 'success' => true,
-                'message' => 'Create new payment successfully',
-                'payment' => $payment
+                'message' => 'Get all payments successfully',
+                'total_result' => $payments->total(),
+                'pagination' => $pagination,
+                'payments' => $resultPayments,
+                'category' => $resultCategory,
             ], 200);
-        } else {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Fields are not proper',
-            ], 404);
+                'message' => 'Internal server error'
+            ], 500);
         }
-        return response()->json([
-            'success' => false,
-            'message' => 'Server error'
-        ], 500);
     }
-    public function paymentsId(Request $request, $id)
+    public function create_payments(Request $request)
     {
-        $payment = Payment::with('category')->find($id);
-        if ($payment) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'cost' => 'required',
+                'currency_type' => 'required',
+                'pay' => 'required',
+                'category_id' => 'required',
+                'exchange_rate_id' => 'required',
+                'payment_date' => 'required',
+
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errorMessage = [];
+                foreach ($errors->all() as $error) {
+                    $errorMessage[] = $error;
+                }
+                return response()->json([
+                    'success' => false,
+                    'message' => implode(', ', $errorMessage)
+                ], 400);
+            }
+            $payment = Payment::create(
+                [
+                    'id' => $request->id,
+                    'user_id' => $request->user_id,
+                    'name' => $request->name,
+                    'cost' => $request->cost,
+                    'currency_type' => $request->currency_type,
+                    'note' => $request->note,
+                    'invoice' => $request->invoice,
+                    'pay' => $request->pay,
+                    'category_id' => $request->category_id,
+                    'exchange_rate_id' => $request->exchange_rate_id,
+                    'payment_date' => $request->payment_date,
+                ]
+            );
+            Category::where('id', $request->category_id)->increment('payment_count');
+            $payment->save();
+            if ($payment) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Create new payment successfully',
+                    'payment' => $payment
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Fields are not proper',
+                ], 404);
+            }
+        } catch (\Exception $e) {
             return response()->json([
-                "success" => true,
-                "message" => "Get payment successfully",
-                "payment" => $payment
-            ], 200);
-        } else {
-            return response()->json([
-                "success" => false,
-                "message" => "Payment not found"
-            ], 404);
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
-        return response()->json([
-            "success" => false,
-            "message" => "Server error"
-        ], 500);
     }
+    public function paymentsId($id)
+    {
+        try {
+            $payments = Payment::with('category')->find($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Get payment successfully',
+                'payments' => $payments,
+
+            ], 200);
+        } catch (\Exception) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
+    }
+
+
     public function update_payments(Request $request, $id)
     {
+        try{
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'cost' => 'required',
             'currency_type' => 'required',
-            'note' => 'required',
-            'invoice' => 'required',
             'pay' => 'required',
             'category_id' => 'required',
             'exchange_rate_id' => 'required',
@@ -114,12 +170,6 @@ class PaymentController extends Controller
             ], 400);
         }
         $payment = Payment::findOrFail($id);
-        if (!$payment) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Fields are not proper',
-            ], 404);
-        }
         $oldCategoryId = $payment->category_id;
         $payment->update($request->all());
         if ($oldCategoryId != $request->category_id) {
@@ -132,10 +182,17 @@ class PaymentController extends Controller
             'message' => 'Update payment successfully',
             'payment' => $payment
         ], 200);
-        
     }
+    catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Internal server error'
+        ], 500);
+    }
+}
     public function delete_payments(Request $request, $id)
     {
+        try{
         $payment = Payment::findOrFail($id);
         if (!$payment) {
             return response()->json([
@@ -146,16 +203,18 @@ class PaymentController extends Controller
         $payment->deleted_at = now();
         $payment->save();
         $category = Category::where('id', $payment->category_id)->decrement('payment_count');
-        if( $category){
+        if ($category) {
             return response()->json([
-            'success' => true,
-            'message' => 'Update payment successfully',
-            'payment' => $payment
-        ], 200);
+                'success' => true,
+                'message' => 'Update payment successfully',
+            ], 200);
         }
+    }
+    catch (\Exception $e) {
         return response()->json([
             'success' => false,
             'message' => 'Internal server error'
         ], 500);
     }
+}
 }
