@@ -13,8 +13,8 @@ class PaymentController extends Controller
     public function get_all_payments(Request $request)
     {
         try {
-            $totalVND = 0;
             $totalUSD = 0;
+            $totalCost = 0;
             $totalJPY = 0;
             $resultPayments = [];
             $perPage = $request->query('per_page') ?? 10;
@@ -30,32 +30,32 @@ class PaymentController extends Controller
             }
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
+                $jpy = $payment->cost * $payment->exchange_rate->jpy;
+                $usd = $payment->cost * $payment->exchange_rate->usd;
+                $totalCost += $payment->cost;
+                $totalUSD += $usd;
+                $totalCost += $payment->cost;
+                $totalJPY += $jpy;
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
                     'name' => $payment->name,
                     'cost' => $payment->cost,
+                    'jpy' => $jpy,
+                    'usd' => $usd,
                     'currency_type' => $payment->currency_type,
                     'note' => $payment->note,
                     'invoice' => $payment->invoice,
                     'pay' => $payment->pay,
                     'exchange_rate_id' => $payment->exchange_rate_id,
                     'payment_date' => $payment->payment_date,
-                    'category' => $resultCategory = [
+                    'category' =>  [
                         'id' => $payment->category->id,
                         'name' => $payment->category->name,
                         'payment_count' => $payment->category->payment_count,
                     ],
-                ];
 
-                // Calculate the total based on currency_type
-                if ($payment->currency_type === 'VND') {
-                    $totalVND += $payment->cost;
-                } elseif ($payment->currency_type === 'USD') {
-                    $totalUSD += $payment->cost;
-                } elseif ($payment->currency_type === 'JPY') {
-                    $totalJPY += $payment->cost;
-                }
+                ];
             }
             $pagination = [
                 'per_page' => $payments->perPage(),
@@ -75,13 +75,13 @@ class PaymentController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Get all payments successfully',
+                'total_usd' => $totalUSD,
+                'total_cost' => $totalCost,
+                'total_jpy' => $totalJPY,
                 'total_result' => $payments->total(),
-                'total_VND' => $totalVND,
-                'total_USD' => $totalUSD,
-                'total_JPY' => $totalJPY,
                 'pagination' => $pagination,
                 'payments' => $resultPayments,
-                'category' => $resultCategory,
+                
             ], 200);
         } catch (\Exception $e) {
             return response()->json([

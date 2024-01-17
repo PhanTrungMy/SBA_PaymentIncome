@@ -24,7 +24,7 @@ class Payment extends Model
     public function category(){
         return $this->belongsTo(Category::class);
     }
-    public function exchange_rates(){
+    public function exchange_rate(){
         return $this->belongsTo(ExchangeRate::class);
     }
     public function user(){
