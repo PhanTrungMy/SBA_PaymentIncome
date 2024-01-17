@@ -178,8 +178,7 @@ Route::group([
         'verifyToken',
     ],
 ], function () {
-    // ExchangeRate
+    // Exchangrate
     Route::get('', [ExchangeRateController::class, 'ExchangeRateByMonthYear']);
-    Route::post('', [ExchangeRateController::class, "CreateExchangeRate"]);
-    Route::put('{id}', [ExchangeRateController::class, 'UpdateChangeRate']);
+    Route::post('', [ExchangeRateController::class, "CreateExchangeRateOrEditExchangeRate"]);
 });
