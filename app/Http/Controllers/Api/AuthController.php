@@ -33,6 +33,7 @@ class AuthController extends Controller
     }
     public function refresh() {
         return $this->createNewToken(auth('api')->refresh());
+        
     }
 
     public function logout()

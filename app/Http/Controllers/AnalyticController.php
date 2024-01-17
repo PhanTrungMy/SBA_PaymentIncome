@@ -11,8 +11,9 @@ use Illuminate\Support\Facades\Validator;
 
 class AnalyticController extends Controller
 {
-    public function category_analytics(Request $request){
-
+    public function category_analytics(Request $request)
+    {
+        try{
         $validated = Validator::make($request->all(), [
             'date' => 'required',
         ]);
@@ -22,51 +23,63 @@ class AnalyticController extends Controller
                 'message' => $validated->errors()
             ], 400);
         }
-        
-        $found_id = ExchangeRate::where('exchange_rate_month', $request->date)->first();
-        if (!$found_id) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Data not found',
-            ], 404);
-        }
-        return $found_id;
-        $categories = DB::select('SELECT 
-          categories.id,
-          categories.name,
-          categories.payment_count,
-          categories.group_id,
-          categories.created_at,
-          categories.updated_at,
-          categories.deleted_at,
 
-          SUM(CASE 
-            WHEN currency_type = "jpy" THEN cost
-            WHEN currency_type = "usd" THEN cost * er.usd
-            ELSE NULL
-          END) AS cost
-          FROM payments
-          INNER JOIN categories ON payments.category_id = categories.id
-          INNER JOIN exchange_rates er ON payments.exchange_rate_id = er.id
-          WHERE exchange_rate_id = ?
-          GROUP BY categories.id, categories.name
-          ORDER BY cost DESC', [$found_id->id]);
-         return $categories;
-        if ($categories) {
-          return response()->json([
-            'success' => true,
-            'message' => 'Category analytics retrieved successfully.',
-            'data' => $categories
-          ], 200);
-        } else {
-          return response()->json([
-            'success' => false,
-            'message' => 'Category analytics not found.',
-          ], 404);
+        $date = $request->input('date');
+        $found_id = DB::table('payments')
+            ->join('categories', 'payments.category_id', '=', 'categories.id')
+            ->join('exchange_rates', 'payments.exchange_rate_id', '=', 'exchange_rates.id')
+            ->select('categories.id', 'categories.name', 'categories.payment_count', 'categories.group_id')
+            ->where('payments.payment_date', 'like', '%' . $date . '%') 
+            ->groupBy('category_id')    
+            ->selectRaw('SUM(CASE
+                WHEN currency_type = "JPY" THEN cost
+                WHEN currency_type = "USD" THEN (cost * exchange_rates.usd) / exchange_rates.jpy
+            END) AS cost_jpy,
+            SUM(CASE
+                WHEN currency_type = "JPY" THEN cost / exchange_rates.jpy
+                WHEN currency_type = "USD" THEN (cost * exchange_rates.usd) / exchange_rates.jpy / exchange_rates.jpy
+            END) AS cost_vnd,
+            SUM(CASE
+                WHEN currency_type = "JPY" THEN cost / exchange_rates.jpy * exchange_rates.usd
+                WHEN currency_type = "USD" THEN (cost * exchange_rates.usd) / exchange_rates.jpy / exchange_rates.jpy * exchange_rates.usd
+            END) AS cost_usd')
+            ->get();
+
+        $total_cost_jpy = $found_id->sum('cost_jpy');
+        $total_cost_vnd = $found_id->sum('cost_vnd');
+        $total_cost_usd = $found_id->sum('cost_usd');
+        if (empty($found_id)) {
+            return response()->json([
+                'success' => true,
+                'message' => 'No data found',
+                'categories' => [
+                    'total_cost_jpy' => 0,
+                    'total_cost_vnd' => 0,
+                    'total_cost_usd' => 0,
+                    'category_analytics' => []
+                ]
+            ], 200);
         }
         return response()->json([
-          'success' => false,
-          'message' => 'Server error'
+            'success' => true,
+            'message' => 'Get categories successfully',
+            'categories' => [
+                'total_cost_jpy' => $total_cost_jpy,
+                'total_cost_vnd' => $total_cost_vnd,
+                'total_cost_usd' => $total_cost_usd,
+                'category_analytics' => $found_id
+            ]
+        ], 200);
+    }
+    catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Internal server error',
         ], 500);
     }
+    }
 }
+
+
+
+   
