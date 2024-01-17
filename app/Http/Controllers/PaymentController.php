@@ -13,6 +13,9 @@ class PaymentController extends Controller
     public function get_all_payments(Request $request)
     {
         try {
+            $totalVND = 0;
+$totalUSD = 0;
+$totalJPY = 0;
             $resultPayments = [];
             $perPage = $request->query('per_page') ?? 10;
             $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
@@ -27,6 +30,17 @@ class PaymentController extends Controller
             }
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
+                switch ($payment->currency_type) {
+                    case 'VND':
+                        $totalVND += $payment->cost;
+                        break;
+                    case 'USD':
+                        $totalUSD += $payment->cost;
+                        break;
+                    case 'JPY':
+                        $totalJPY += $payment->cost;
+                        break;
+                }
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
@@ -50,11 +64,23 @@ class PaymentController extends Controller
                 'current_page' => $payments->currentPage(),
                 'total_pages' => $payments->lastPage(),
             ];
-
+            if (empty($resultPayments)) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'No data found',
+                    'total_result' => 0,
+                    'pagination' => null,
+                    'payments' => [],
+                    'category' => null,
+                ], 200);
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Get all payments successfully',
                 'total_result' => $payments->total(),
+                'total_VND' => $totalVND,
+                'total_USD' => $totalUSD,
+                'total_JPY' => $totalJPY,
                 'pagination' => $pagination,
                 'payments' => $resultPayments,
                 'category' => $resultCategory,
@@ -147,74 +173,72 @@ class PaymentController extends Controller
 
     public function update_payments(Request $request, $id)
     {
-        try{
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'cost' => 'required',
-            'currency_type' => 'required',
-            'pay' => 'required',
-            'category_id' => 'required',
-            'exchange_rate_id' => 'required',
-            'payment_date' => 'required',
+        try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'cost' => 'required',
+                'currency_type' => 'required',
+                'pay' => 'required',
+                'category_id' => 'required',
+                'exchange_rate_id' => 'required',
+                'payment_date' => 'required',
 
-        ]);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            $errorMessage = [];
-            foreach ($errors->all() as $error) {
-                $errorMessage[] = $error;
+            ]);
+            if ($validator->fails()) {
+                $errors = $validator->errors();
+                $errorMessage = [];
+                foreach ($errors->all() as $error) {
+                    $errorMessage[] = $error;
+                }
+                return response()->json([
+                    'success' => false,
+                    'message' => implode(', ', $errorMessage)
+                ], 400);
             }
-            return response()->json([
-                'success' => false,
-                'message' => implode(', ', $errorMessage)
-            ], 400);
-        }
-        $payment = Payment::findOrFail($id);
-        $oldCategoryId = $payment->category_id;
-        $payment->update($request->all());
-        if ($oldCategoryId != $request->category_id) {
-            Category::where('id', $oldCategoryId)->decrement('payment_count');
-            Category::where('id', $request->category_id)->increment('payment_count');
-        }
+            $payment = Payment::findOrFail($id);
+            $oldCategoryId = $payment->category_id;
+            $payment->update($request->all());
+            if ($oldCategoryId != $request->category_id) {
+                Category::where('id', $oldCategoryId)->decrement('payment_count');
+                Category::where('id', $request->category_id)->increment('payment_count');
+            }
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Update payment successfully',
-            'payment' => $payment
-        ], 200);
-    }
-    catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Internal server error'
-        ], 500);
-    }
-}
-    public function delete_payments(Request $request, $id)
-    {
-        try{
-        $payment = Payment::findOrFail($id);
-        if (!$payment) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Not found payment',
-            ], 404);
-        }
-        $payment->deleted_at = now();
-        $payment->save();
-        $category = Category::where('id', $payment->category_id)->decrement('payment_count');
-        if ($category) {
             return response()->json([
                 'success' => true,
                 'message' => 'Update payment successfully',
+                'payment' => $payment
             ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
         }
     }
-    catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Internal server error'
-        ], 500);
+    public function delete_payments(Request $request, $id)
+    {
+        try {
+            $payment = Payment::findOrFail($id);
+            if (!$payment) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Not found payment',
+                ], 404);
+            }
+            $payment->deleted_at = now();
+            $payment->save();
+            $category = Category::where('id', $payment->category_id)->decrement('payment_count');
+            if ($category) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Update payment successfully',
+                ], 200);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
     }
-}
 }
