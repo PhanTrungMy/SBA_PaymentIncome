@@ -30,23 +30,13 @@ class AnalyticController extends Controller
             ->join('exchange_rates', 'payments.exchange_rate_id', '=', 'exchange_rates.id')
             ->select('categories.id', 'categories.name', 'categories.payment_count', 'categories.group_id')
             ->where('payments.payment_date', 'like', '%' . $date . '%') 
-            ->groupBy('category_id')    
-            ->selectRaw('SUM(CASE
-                WHEN currency_type = "JPY" THEN cost
-                WHEN currency_type = "USD" THEN (cost * exchange_rates.usd) / exchange_rates.jpy
-            END) AS cost_jpy,
-            SUM(CASE
-                WHEN currency_type = "JPY" THEN cost / exchange_rates.jpy
-                WHEN currency_type = "USD" THEN (cost * exchange_rates.usd) / exchange_rates.jpy / exchange_rates.jpy
-            END) AS cost_vnd,
-            SUM(CASE
-                WHEN currency_type = "JPY" THEN cost / exchange_rates.jpy * exchange_rates.usd
-                WHEN currency_type = "USD" THEN (cost * exchange_rates.usd) / exchange_rates.jpy / exchange_rates.jpy * exchange_rates.usd
-            END) AS cost_usd')
+            ->groupBy('category_id')
+            ->selectRaw('SUM(payments.cost) AS total_cost, 
+                             SUM(payments.cost * exchange_rates.usd) AS cost_usd,
+                                SUM(payments.cost * exchange_rates.jpy) AS cost_jpy')
             ->get();
-
         $total_cost_jpy = $found_id->sum('cost_jpy');
-        $total_cost_vnd = $found_id->sum('cost_vnd');
+        $total_cost_vnd = $found_id->sum('total_cost');
         $total_cost_usd = $found_id->sum('cost_usd');
         if (empty($found_id)) {
             return response()->json([
@@ -68,6 +58,7 @@ class AnalyticController extends Controller
                 'total_cost_vnd' => $total_cost_vnd,
                 'total_cost_usd' => $total_cost_usd,
                 'category_analytics' => $found_id
+                
             ]
         ], 200);
     }

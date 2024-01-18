@@ -117,9 +117,10 @@ class PaymentController extends Controller
                     'message' => implode(', ', $errorMessage)
                 ], 400);
             }
+       
             $payment = Payment::create(
-                [
-                    'id' => $request->id,
+                [         
+                    'id' => $request->id,  
                     'user_id' => $request->user_id,
                     'name' => $request->name,
                     'cost' => $request->cost,
@@ -132,6 +133,11 @@ class PaymentController extends Controller
                     'payment_date' => $request->payment_date,
                 ]
             );
+            return response()->json([
+                'success' => true,
+                'message' => 'Create new payment successfully',
+                'payment' => $payment
+            ], 200);
             Category::where('id', $request->category_id)->increment('payment_count');
             $payment->save();
             if ($payment) {

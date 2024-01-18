@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -19,21 +20,16 @@ class CategoryController extends Controller
             $name = $request->input('name');
             $groupId = $request->input('group_id');
             $reportType = $request->input('report_type');
-            $query = Category::where('deleted_at', null);
-            if (!empty($name)) {
-                $query->where('name', 'like', "%{$name}%");
+            $query =DB::table('categories')
+                  ->join('groups', 'categories.group_id', '=', 'groups.id')
+                  ->where('categories.name', 'like', '%' . $name . '%')
+                    ->whereNull('categories.deleted_at');
+            if ($groupId !== null) {
+                $query->where('categories.group_id', $groupId);
             }
-
-            if (!empty($groupId)) {
-                $query->where('group_id', $groupId);
-            }
-
-            if (!empty($reportType)) {
-                $query->whereHas('group', function ($q) use ($reportType) {
-                    $q->where('report_type', $reportType);
-                });
-            }
-
+            if ($reportType !== null) {
+                $query->where('groups.report_type', $reportType);
+            }   
             $categories = $query->paginate($perPage);
             foreach ($categories as $category) {
                 $resultCategory[] = [
@@ -41,8 +37,9 @@ class CategoryController extends Controller
                     'name' => $category->name,
                     'group_id' => $category->group_id,
                     'payment_count' => $category->payment_count,
-                    'created_at' => $category->created_at->toDateTimeString(),
-                    'updated_at' => $category->updated_at->toDateTimeString()
+                    'created_at' => $category->created_at,
+                    'updated_at' => $category->updated_at,
+                    'report_type' => $category->report_type
                 ];
             }
             $pagination = [
