@@ -28,14 +28,17 @@ class PaymentController extends Controller
                 $query->whereMonth('payment_date', $month)
                     ->whereYear('payment_date', $year);
             }
+            $totalCost = $query->sum('cost');
+            $totalUSD = $query->get()->reduce(function ($carry, $payment) {
+                return $carry + $payment->cost * $payment->exchange_rate->usd;
+            }, 0);
+            $totalJPY = $query->get()->reduce(function ($carry, $payment) {
+                return $carry + $payment->cost * $payment->exchange_rate->jpy;
+            }, 0);
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
                 $jpy = $payment->cost * $payment->exchange_rate->jpy;
                 $usd = $payment->cost * $payment->exchange_rate->usd;
-                $totalCost += $payment->cost;
-                $totalUSD += $usd;
-                $totalCost += $payment->cost;
-                $totalJPY += $jpy;
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
@@ -81,7 +84,7 @@ class PaymentController extends Controller
                 'total_result' => $payments->total(),
                 'pagination' => $pagination,
                 'payments' => $resultPayments,
-                
+
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
