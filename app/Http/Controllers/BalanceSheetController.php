@@ -13,19 +13,19 @@ class BalanceSheetController extends Controller
         $validator = Validator::make($request->all(), [
             'month_year' => 'required|date_format:Y-m',
             'balances' => 'required|array',
-            'balances.*.amount' => 'required|float|integer',
+            'balances.*.amount' => 'required|numeric',
             'balances.*.category_id' => 'required|integer|exists:categories,id'
         ], [
             'month_year.date_format' => 'month_year is invalid',
         ]);
 
         if ($validator->fails()) {
-            // Lấy thông báo lỗi đầu tiên
+
             $errors = $validator->errors();
             $firstError = $errors->keys()[0];
             $firstErrorMessage = $errors->first($firstError);
 
-            // Tùy chỉnh thông báo lỗi
+
             $customErrorMessage = str_replace(' field', '', $firstErrorMessage);
             $customErrorMessage = str_replace('The ', '', $customErrorMessage);
             $customErrorMessage = str_replace('balances.0.', '', $customErrorMessage);
@@ -36,7 +36,7 @@ class BalanceSheetController extends Controller
             ], 400);
         }
 
-        // Phần còn lại của hàm không thay đổi
+
         foreach ($request->balances as $balance) {
             BalanceSheet::create([
                 'bs_month_year' => $request->month_year,
@@ -50,6 +50,7 @@ class BalanceSheetController extends Controller
             'message' => 'Create balance_sheets successfully'
         ], 200);
     }
+
 
 
     public function balance_get(Request $request)
