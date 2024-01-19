@@ -16,8 +16,14 @@ class PaymentOrderController extends Controller
             $resultPayments = [];
             $perPage = $request->query('per_page') ?? 5;
             $perPage = in_array($perPage, [5, 10, 20]) ? $perPage : 5;
+            $month = $request["month"];
+            $year = $request["year"];
             $query = PaymentOrder::where('deleted_at', null);
             $payment_order = $query->paginate($perPage);
+            if ($month && $year) {
+                $query->whereMonth('payment_date', $month)
+                    ->whereYear('payment_date', $year);
+            }
             foreach ($payment_order as $payment) {
                 $resultPayments[] = [
                     "id" => $payment->id,
