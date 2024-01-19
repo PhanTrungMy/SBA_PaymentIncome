@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Payment extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'user_id',
         'name',
@@ -21,13 +21,16 @@ class Payment extends Model
         'exchange_rate_id',
         'payment_date',
     ];
-    public function category(){
+    public function category()
+    {
         return $this->belongsTo(Category::class);
     }
-    public function exchange_rate(){
+    public function exchange_rates()
+    {
         return $this->belongsTo(ExchangeRate::class);
     }
-    public function user(){
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }

@@ -162,14 +162,24 @@ Route::group([
     Route::get('', [BalanceSheetController::class, 'balance_get']);
 });
 Route::group([
-    'prefix' => 'getData',
+    'prefix' => 'getDataPL',
     'middleware' => [
         'checkLogin',
         'verifyToken',
     ],
 ], function () {
     // getDate
-    Route::get('', [DataTableController::class, 'get_data_table']);
+    Route::get('', [DataTableController::class, 'get_data_table_pl']);
+});
+Route::group([
+    'prefix' => 'getDataBS',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // getDate
+    Route::get('', [DataTableController::class, 'get_data_table_bs']);
 });
 Route::group([
     'prefix' => 'exchangeRate',
