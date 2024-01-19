@@ -214,7 +214,7 @@ class CategoryController extends Controller
         if ($categories->count() == 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'No categories found'
+                'message' => 'Category not found'
             ], 404);
         }
 
@@ -222,7 +222,7 @@ class CategoryController extends Controller
             if ($category->payment_count > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'The category has transactions',
+                    'message' => 'The category has generated transactions',
                     'payment_count' => $category->payment_count
                 ], 409);
             }
