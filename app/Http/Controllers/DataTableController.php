@@ -252,7 +252,7 @@ class DataTableController extends Controller
                     break;
                 case 24:
                     if (isset($totalMonths[23])) {
-                        $categoryData = $this->calculateMonthlyTotalsForCategorybs(1, $year);
+                        $categoryData = $this->calculateMonthlyTotalsForCategorybs(56, $year);
                         $groupData['total_month'] = $this->calculateDifferencebs($totalMonths[23], $categoryData);
                         $totalMonths[24] = $this->calculateDifferencebs($totalMonths[23], $categoryData);
                     }

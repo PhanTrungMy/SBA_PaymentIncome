@@ -20,7 +20,7 @@ class ExchangeRate extends Model
     public function orders(){
         return $this->belongsTo(Order::class);
     }
-    public function payment_orders(){
+    public function payment_order(){
         return $this->belongsTo(PaymentOrder::class);
     }
     public function outsourcing(){

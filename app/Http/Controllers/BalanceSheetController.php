@@ -13,7 +13,7 @@ class BalanceSheetController extends Controller
         $validator = Validator::make($request->all(), [
             'month_year' => 'required|date_format:Y-m',
             'balances' => 'required|array',
-            'balances.*.amount' => 'required|numeric',
+            'balances.*.amount' => 'required|float|integer',
             'balances.*.category_id' => 'required|integer|exists:categories,id'
         ], [
             'month_year.date_format' => 'month_year is invalid',

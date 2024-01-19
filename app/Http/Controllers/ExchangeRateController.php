@@ -100,12 +100,12 @@ class ExchangeRateController extends Controller
         $usd = $request["usd"];
         $exchangeRate = Validator::make($request->all(), [
             "exchangeDate" => "nullable|string",
-            "jpy" => "required|numeric",
-            "usd" => "required|numeric"
+            "jpy" => "required|float|integer",
+            "usd" => "required|float"
         ], [
             "jpy.required" => "jpy is required",
-            "jpy.numeric" => "jpy is numeric",
-            "usd.numeric" => "usd is numeric",
+            "jpy.float" => "jpy is float",
+            "usd.float" => "usd is float",
             "usd.required" => "usd is required"
         ]);
         if ($exchangeRate->fails()) {

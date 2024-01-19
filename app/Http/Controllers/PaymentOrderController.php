@@ -81,7 +81,7 @@ class PaymentOrderController extends Controller
         try {
             $validator = Validator::make($request->all(), [
                 'company_name' => 'required|string',
-                'vnd' => 'required|numeric',
+                'vnd' => 'required|float',
                 'payment_date' => 'required',
                 'exchange_rate_id' => 'required',
             ]);
@@ -146,7 +146,7 @@ class PaymentOrderController extends Controller
         try{
         $validated = Validator::make($request->all(), [
             'company_name' => 'required|string',
-            'vnd' => 'required|numeric',
+            'vnd' => 'required|float',
             'payment_date' => 'required',
             'exchange_rate_id' => 'required',
         ]);
