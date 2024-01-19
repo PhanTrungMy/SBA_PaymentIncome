@@ -31,12 +31,12 @@ class AnalyticController extends Controller
             ->select('categories.id', 'categories.name', 'categories.payment_count', 'categories.group_id')
             ->where('payments.payment_date', 'like', '%' . $date . '%') 
             ->groupBy('category_id')
-            ->selectRaw('SUM(payments.cost) AS total_cost, 
+            ->selectRaw('SUM(payments.cost) AS cost_vnd, 
                              SUM(payments.cost * exchange_rates.usd) AS cost_usd,
                                 SUM(payments.cost * exchange_rates.jpy) AS cost_jpy')
             ->get();
         $total_cost_jpy = $found_id->sum('cost_jpy');
-        $total_cost_vnd = $found_id->sum('total_cost');
+        $total_cost_vnd = $found_id->sum('cost_vnd');
         $total_cost_usd = $found_id->sum('cost_usd');
         if (empty($found_id)) {
             return response()->json([

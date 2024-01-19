@@ -30,15 +30,15 @@ class PaymentController extends Controller
             }
             $totalCost = $query->sum('cost');
             $totalUSD = $query->get()->reduce(function ($carry, $payment) {
-                return $carry + $payment->cost * $payment->exchange_rate->usd;
+                return $carry + $payment->cost / $payment->exchange_rate->usd;
             }, 0);
             $totalJPY = $query->get()->reduce(function ($carry, $payment) {
-                return $carry + $payment->cost * $payment->exchange_rate->jpy;
+                return $carry + $payment->cost / $payment->exchange_rate->jpy;
             }, 0);
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
-                $jpy = $payment->cost * $payment->exchange_rate->jpy;
-                $usd = $payment->cost * $payment->exchange_rate->usd;
+                $jpy = $payment->cost / $payment->exchange_rate->jpy;
+                $usd = $payment->cost / $payment->exchange_rate->usd;
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
