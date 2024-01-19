@@ -219,6 +219,10 @@ class DataTableController extends Controller
                     if (isset($totalMonths[19])) {
                         $groupData['total_month'] = $totalMonths[19];
                     }
+                case 21:
+                    if (isset($totalMonths[20])) {
+                        $groupData['total_month'] = $totalMonths[20];
+                    }
                 case 23:
                     if (isset($totalMonths[18]) && isset($totalMonths[21])) {
                         $groupData['total_month'] = $this->calculateDifferencebs($totalMonths[12], $totalMonths[11]);

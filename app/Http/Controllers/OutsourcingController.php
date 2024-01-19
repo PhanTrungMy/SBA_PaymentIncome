@@ -157,25 +157,32 @@ class OutsourcingController extends Controller
         }
     }
 
-    public function delete_outsourcing($id)
+    public function delete_outsourcing(Request $request)
     {
-        try {
-            $outsourcing = Outsourcing::find($id);
+        $ids = $request->input('id');
 
-            if (!$outsourcing) {
-                return response()->json([
+        if (!$ids || !is_array($ids)) {
+            return response()->json(
+                [
                     'success' => false,
                     'message' => 'Outsourcing not found'
-                ], 404);
-            }
+                ],
+                400
+            );
+        }
 
-            $deletedOutsourcing = clone $outsourcing;
-            $outsourcing->delete();
+        try {
+            $deleted = [];
+            foreach ($ids as $id) {
+                $outsourcing = Outsourcing::find($id);
+                if (!$outsourcing) {
+                    continue;
+                }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Update outsourcing successfully',
-                'outsourcing' => [
+                $deletedOutsourcing = clone $outsourcing;
+                $outsourcing->delete();
+
+                $deleted[] = [
                     'id' => $deletedOutsourcing->id,
                     'user_id' => $deletedOutsourcing->user_id,
                     'company_name' => $deletedOutsourcing->company_name,
@@ -188,9 +195,15 @@ class OutsourcingController extends Controller
                     'created_at' => $deletedOutsourcing->created_at->toDateTimeString(),
                     'updated_at' => $deletedOutsourcing->updated_at->toDateTimeString(),
                     'deleted_at' => now()->toDateTimeString()
-                ]
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Deleted outsourcings',
+                'outsourcings' => $deleted
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error'

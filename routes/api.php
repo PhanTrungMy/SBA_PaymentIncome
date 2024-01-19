@@ -110,7 +110,7 @@ Route::group([
     Route::get('', [CategoryController::class, 'catogory_show_all']);
     Route::get('{id}', [CategoryController::class, 'catogory_show_id']);
     Route::put('{id}', [CategoryController::class, 'catogory_update']);
-    Route::delete('{id}', [CategoryController::class, 'catogory_delete']);
+    Route::delete('', [CategoryController::class, 'category_delete']);
 });
 Route::group([
     'prefix' => 'orders',
@@ -138,7 +138,7 @@ Route::group([
     Route::get('{id}', [OutsourcingController::class, 'show_id_outsourcing']);
     Route::post('', [OutsourcingController::class, 'create_outsourcing']);
     Route::put('{id}', [OutsourcingController::class, 'update_outsourcing']);
-    Route::delete('{id}', [OutsourcingController::class, 'delete_outsourcing']);
+    Route::delete('', [OutsourcingController::class, 'delete_outsourcing']);
 });
 Route::group([
     'prefix' => 'analytics',

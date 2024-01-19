@@ -13,53 +13,54 @@ class CategoryController extends Controller
 {
     public function catogory_show_all(Request $request)
     {
-        try {
-            $resultCategory = [];
-            // Lấy dữ liệu từ request body
-            $perPage = $request->input('per_page', 10);
-            $name = $request->input('name');
-            $groupId = $request->input('group_id');
-            $reportType = $request->input('report_type');
-            $query =DB::table('categories')
-                  ->join('groups', 'categories.group_id', '=', 'groups.id')
-                  ->where('categories.name', 'like', '%' . $name . '%')
-                    ->whereNull('categories.deleted_at');
-            if ($groupId !== null) {
-                $query->where('categories.group_id', $groupId);
-            }
-            if ($reportType !== null) {
-                $query->where('groups.report_type', $reportType);
-            }   
-            $categories = $query->paginate($perPage);
-            foreach ($categories as $category) {
-                $resultCategory[] = [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'group_id' => $category->group_id,
-                    'payment_count' => $category->payment_count,
-                    'created_at' => $category->created_at,
-                    'updated_at' => $category->updated_at,
-                    'report_type' => $category->report_type
-                ];
-            }
-            $pagination = [
+        $perPage = $request->query('per_page', 10);
+        $page = $request->query('page', 1);
+        $name = $request->query('name');
+        $groupId = $request->query('group_id');
+        $reportType = $request->query('report_type');
+
+        $query = Category::with('group')
+            ->join('groups', 'categories.group_id', '=', 'groups.id')
+            ->select('categories.*', 'groups.report_type');
+
+        if (!empty($name)) {
+            $query->where('categories.name', 'LIKE', "%{$name}%");
+        }
+
+        if (!empty($groupId)) {
+            $query->where('categories.group_id', $groupId);
+        }
+
+        if (!empty($reportType)) {
+            $query->where('groups.report_type', $reportType);
+        }
+
+        $categories = $query->paginate($perPage, ['*'], 'page', $page);
+
+        $transformedCategories = $categories->getCollection()->transform(function ($category) {
+            return [
+                'id' => $category->id,
+                'name' => $category->name,
+                'group_id' => $category->group_id,
+                'payment_count' => $category->payment_count,
+                'created_at' => $category->created_at->toDateTimeString(),
+                'updated_at' => $category->updated_at->toDateTimeString(),
+                'deleted_at' => $category->deleted_at ? $category->deleted_at->toDateTimeString() : null,
+                'report_type' => $category->group ? $category->group->report_type : null,
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Get all categories successfully',
+            'total_result' => $categories->total(),
+            'pagination' => [
                 'per_page' => $categories->perPage(),
                 'current_page' => $categories->currentPage(),
                 'total_pages' => $categories->lastPage(),
-            ];
-            return response()->json([
-                'success' => true,
-                'message' => 'Get all categories successfully',
-                'total_result' => $categories->total(),
-                'pagination' => $pagination,
-                'categories' => $resultCategory
-            ], 200);
-        } catch (Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Internal server error'
-            ], 500);
-        }
+            ],
+            'categories' => $transformedCategories
+        ], 200);
     }
 
     public function catogory_show_id($id)
@@ -203,19 +204,21 @@ class CategoryController extends Controller
         }
     }
 
-    public function catogory_delete($id)
+    public function category_delete(Request $request)
     {
-        try {
-            $category = Category::find($id);
+        $ids = $request->input('id');
+
+        $categories = Category::whereIn('id', $ids)->get();
 
 
-            if (!$category || !is_null($category->deleted_at)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Category not found'
-                ], 404);
-            }
+        if ($categories->count() == 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Category not found'
+            ], 404);
+        }
 
+        foreach ($categories as $category) {
             if ($category->payment_count > 0) {
                 return response()->json([
                     'success' => false,
@@ -223,27 +226,31 @@ class CategoryController extends Controller
                     'payment_count' => $category->payment_count
                 ], 409);
             }
+        }
 
+        $deleted = $categories->each(function ($category) {
             $category->deleted_at = now();
             $category->save();
+        });
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Deleted category successfully',
-                'category' => [
-                    'id' => $category->id,
-                    'name' => $category->name,
-                    'group_id' => $category->group_id,
-                    'created_at' => $category->created_at->toDateTimeString(),
-                    'updated_at' => $category->updated_at->toDateTimeString(),
-                    'deleted_at' => $category->deleted_at->toDateTimeString()
-                ]
-            ], 200);
-        } catch (Exception $e) {
+        if (!$deleted) {
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error'
             ], 500);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Deleted category successfully',
+            'category' => [
+                'id' => $category->id,
+                'name' => $category->name,
+                'group_id' => $category->group_id,
+                'created_at' => $category->created_at->toDateTimeString(),
+                'updated_at' => $category->updated_at->toDateTimeString(),
+                'deleted_at' => $category->deleted_at->toDateTimeString()
+            ]
+        ], 200);
     }
 }
