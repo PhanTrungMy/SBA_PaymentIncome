@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use App\Models\Payment;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -21,44 +22,44 @@ class PaymentController extends Controller
             $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
             $month = $request["month"];
             $year = $request["year"];
-            $query = Payment::with('Category')
-                ->whereNull('deleted_at')->orderBy('id', 'asc');
+            $query = Payment::with(['Category', 'exchange_rate'])
+            ->whereNull('deleted_at')->orderBy('created_at', 'desc');
 
             if ($month && $year) {
                 $query->whereMonth('payment_date', $month)
                     ->whereYear('payment_date', $year);
             }
             $totalCost = $query->sum('cost');
-            $totalUSD = $query->get()->reduce(function ($carry, $payment) {
-                return $carry + $payment->cost / $payment->exchange_rate->usd;
-            }, 0);
-            $totalJPY = $query->get()->reduce(function ($carry, $payment) {
-                return $carry + $payment->cost / $payment->exchange_rate->jpy;
-            }, 0);
+            
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
-                $jpy = $payment->cost / $payment->exchange_rate->jpy;
-                $usd = $payment->cost / $payment->exchange_rate->usd;
-                $resultPayments[] = [
-                    "id" => $payment->id,
-                    'user_id' => $payment->user_id,
-                    'name' => $payment->name,
-                    'cost' => $payment->cost,
-                    'jpy' => $jpy,
-                    'usd' => $usd,
-                    'currency_type' => $payment->currency_type,
-                    'note' => $payment->note,
-                    'invoice' => $payment->invoice,
-                    'pay' => $payment->pay,
-                    'exchange_rate_id' => $payment->exchange_rate_id,
-                    'payment_date' => $payment->payment_date,
-                    'category' =>  [
-                        'id' => $payment->category->id,
-                        'name' => $payment->category->name,
-                        'payment_count' => $payment->category->payment_count,
-                    ],
-
-                ];
+                $paymentDate = Carbon::parse($payment->payment_date);
+                $exchangeRateMonth = Carbon::parse($payment->exchange_rate->exchange_rate_month);
+                if ($paymentDate->format('Y-m') == $exchangeRateMonth->format('Y-m')) {
+                    $usd = $payment->cost / $payment->exchange_rate->usd;
+                    $jpy = $payment->cost / $payment->exchange_rate->jpy;
+                    $totalUSD = $totalCost / $payment->exchange_rate->usd;
+                    $totalJPY = $totalCost / $payment->exchange_rate->jpy;
+                    $resultPayments[] = [
+                        "id" => $payment->id,
+                        'user_id' => $payment->user_id,
+                        'name' => $payment->name,
+                        'cost' => $payment->cost,
+                        'usd' => $usd,
+                        'jpy' => $jpy,
+                        'currency_type' => $payment->currency_type,
+                        'note' => $payment->note,
+                        'invoice' => $payment->invoice,
+                        'pay' => $payment->pay,
+                        'exchange_rate_id' => $payment->exchange_rate_id,
+                        'payment_date' => $payment->payment_date,
+                        'category' =>  [
+                            'id' => $payment->category->id,
+                            'name' => $payment->category->name,
+                            'payment_count' => $payment->category->payment_count,
+                        ],
+                    ];
+                }
             }
             $pagination = [
                 'per_page' => $payments->perPage(),
@@ -84,7 +85,6 @@ class PaymentController extends Controller
                 'total_result' => $payments->total(),
                 'pagination' => $pagination,
                 'payments' => $resultPayments,
-
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
