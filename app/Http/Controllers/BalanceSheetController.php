@@ -59,8 +59,10 @@ class BalanceSheetController extends Controller
                 'month_year' => 'required|date_format:Y-m'
             ]);
 
-            $balanceSheets = BalanceSheet::where('bs_month_year', $validatedData['month_year'])
-                ->whereNull('deleted_at')
+            $balanceSheets = BalanceSheet::join('categories', 'balance_sheets.category_id', '=', 'categories.id')
+                ->select('balance_sheets.*', 'categories.name AS category_name')
+                ->where('balance_sheets.bs_month_year', $validatedData['month_year'])
+                ->whereNull('balance_sheets.deleted_at')
                 ->get();
 
             if ($balanceSheets->isEmpty()) {
