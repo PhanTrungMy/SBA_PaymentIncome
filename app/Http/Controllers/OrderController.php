@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -12,38 +13,46 @@ class OrderController extends Controller
     function Get_all_order(Request $request)
     {
         try {
-            $Get_all = DB::table("orders")->where("deleted_at", null)->get();
+            $perPage = $request->input('perPage', 10);
+            $perPageOptions = [10, 20];
+            $Page = $request["Page"];
 
-            $perPage = $request["perPage"];
-            $page = $request["page"];
+            if (!in_array($perPage, $perPageOptions)) {
+                $perPage = 10;
+            }
+            $currentPage = request()->query('page', $Page);
 
+            $data_1 = Order::whereNull('deleted_at')
+                ->orderBy('id', 'asc')
+                ->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             $Get_All_paginator = DB::table("orders")->where("deleted_at", null)->paginate($perPage);
 
             if ($Get_All_paginator->count() > 0) {
+                
                 return response()->json([
                     "success" => true,
                     "message" => "Get all order successfully",
-                    "total_results" =>$Get_All_paginator->total(),
+                    "total_results" => $Get_All_paginator->total(),
                     "pagination" => [
-                        "per_page" => $perPage, //$Get_All_paginator->perPage(),
-                        "current_page" =>$Get_All_paginator->currentPage(),
+                        "per_page" => $perPage,
+                        "current_page" => $currentPage,
                         "total_pages" => $Get_All_paginator->lastPage(),
                     ],
-                    "orders" => $Get_All_paginator->items(),
+                    "orders" => $data_1->items(),
                 ], 200);
-            } 
+            }
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
                 "message" => "Internal server error"
             ], 500);
         }
+
     }
 
     function Get_Order_By_ID(Request $request, $id)
     {
         try {
-            // $ID_Order = $request["id"];
             $OrderByID = DB::table("orders")->where("id", $id)->get();
             if ($OrderByID->count() > 0) {
                 return response()->json([
