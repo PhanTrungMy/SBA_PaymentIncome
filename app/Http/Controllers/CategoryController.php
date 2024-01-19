@@ -236,7 +236,7 @@ class CategoryController extends Controller
         if (!$deleted) {
             return response()->json([
                 'success' => false,
-                'message' => 'Delete failed'
+                'message' => 'Internal server error'
             ], 500);
         }
 
