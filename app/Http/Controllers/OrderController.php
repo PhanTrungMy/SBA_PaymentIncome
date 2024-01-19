@@ -38,7 +38,7 @@ class OrderController extends Controller
                         "current_page" => $currentPage,
                         "total_pages" => $Get_All_paginator->lastPage(),
                     ],
-                    "orders" => $data_1,
+                    "orders" => $data_1->items(),
                 ], 200);
             }
         } catch (\Exception $e) {
@@ -53,7 +53,6 @@ class OrderController extends Controller
     function Get_Order_By_ID(Request $request, $id)
     {
         try {
-            // $ID_Order = $request["id"];
             $OrderByID = DB::table("orders")->where("id", $id)->get();
             if ($OrderByID->count() > 0) {
                 return response()->json([
@@ -83,11 +82,11 @@ class OrderController extends Controller
 
         $order_create_2 = Validator::make($request->all(), [
             'company_name' => "string",
-            'vnd' => 'nullable|float',
+            'vnd' => 'nullable|numeric',
             'order_date' => "nullable|date"
         ], [
             'company_name.string' => "company_name is string",
-            "vnd.float" => "vnd furigana is float",
+            "vnd.numeric" => "vnd furigana is numeric",
             "order_date.date" => "order date is date"
         ]);
 
@@ -147,11 +146,11 @@ class OrderController extends Controller
 
         $order_create_2 = Validator::make($request->all(), [
             'company_name' => "string",
-            'vnd' => 'nullable|float',
+            'vnd' => 'nullable|numeric',
             'order_date' => "nullable|date"
         ], [
             'company_name.string' => "company_name is string",
-            "vnd.float" => "vnd furigana is float",
+            "vnd.numeric" => "vnd furigana is numeric",
             "order_date.date" => "order date is date"
         ]);
 
@@ -213,31 +212,48 @@ class OrderController extends Controller
             }
         }
     }
-    function Delete_Order(Request $request, $id){
-        $delete_order_check = DB::table("orders")->where("id", $id)->first();
-        $delete_order = DB::table("orders")->where("id", $id);
-        if($delete_order_check!=null){
-            $delete_order->update([
-                "deleted_at"=>now()
-            ]);
-            return response()->json([
-                "success" => true,
-                "message" => "Delete order successfully",
-                "order" => DB::table("orders")->where("id", $id)->first()
-            ], 200);
-        }
-        if ($delete_order_check==null){
-            return response()->json([
-                "success"=>false,
-                "message"=>"Order not found"
-            ], 404);
-        }
-        $check_fails = DB::table("orders")->where("id", $id)->first();
-        if($check_fails == null){
-            return response()->json([
-                "success"=>"fails",
-                "message"=>"Internal server error"
-            ], 500);
+    function Delete_Order(Request $request){
+        if ($request->has("id")) {
+            $id = $request->input("id");
+            $count = is_array($id) ? count($id) : 1;
+            if ($count == 1) {
+                $delete_order_check = DB::table("orders")->where("id", $id[0])->first();
+                $delete_order = DB::table("orders")->where("id", $id[0]);
+                if ($delete_order_check != null) {
+                    $delete_order->update([
+                        "deleted_at" => now()
+                    ]);
+                    return response()->json([
+                        "success" => true,
+                        "message" => "Delete order successfully",
+                        "orders" => DB::table("orders")->where("id", $id[0])->first()
+                    ], 200);
+                }
+                if ($delete_order_check == null) {
+                    return response()->json([
+                        "success" => false,
+                        "message" => "Order not found"
+                    ], 404);
+                }
+            }
+            if ($count > 1) {
+                $arr_delete_not_null = [];
+                foreach ($id as $key) {
+                    $delete_order_check = DB::table("orders")->where("id", $key)->first();
+                    $delete_order = DB::table("orders")->where("id", $key);
+                    if($delete_order_check != null){
+                        $delete_order->update([
+                            "deleted_at" => now(),
+                        ]);
+                        $arr_delete_not_null[] = $delete_order->first();
+                    }
+                }
+                return response()->json([
+                    "success"=>true,
+                    "message" => "Delete order successfully",
+                    "orders" => $arr_delete_not_null,
+                ]);
+            }
         }
     }
 }

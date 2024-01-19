@@ -47,7 +47,7 @@ class AuthController extends Controller
 protected function createNewToken($token)
 {
     $user = auth('api')->user();
-    $user->makeHidden(['id','created_at', 'updated_at']);
+    $user->makeHidden(['created_at', 'updated_at']);
     return response()->json([
         'message' => 'User successfully signed in',
         'access_token' => $token,

@@ -124,7 +124,7 @@ Route::group([
     Route::get('{id}', [OrderController::class, 'Get_Order_By_ID']);
     Route::post('', [OrderController::class, 'Create_Order']);
     Route::put('{id}', [OrderController::class, 'Update_Order']);
-    Route::delete('{id}', [OrderController::class, 'Delete_Order']);
+    Route::delete('', [OrderController::class, 'Delete_Order']);
 });
 Route::group([
     'prefix' => 'outsourcing',
