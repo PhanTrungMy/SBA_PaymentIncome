@@ -16,8 +16,19 @@ class OutsourcingController extends Controller
             $perPage = $request->query('per_page', 5);
             $page = $request->query('page', 1);
 
-            $outsourcing = Outsourcing::whereNull('deleted_at')
-                ->paginate($perPage, ['*'], 'page', $page);
+            $outsourcing = Outsourcing::whereNull('deleted_at');
+
+            if ($request->has('month')) {
+                $month = $request->query('month');
+                $outsourcing = $outsourcing->whereMonth('outsourced_date', $month);
+            }
+
+            if ($request->has('year')) {
+                $year = $request->query('year');
+                $outsourcing = $outsourcing->whereYear('outsourced_date', $year);
+            }
+
+            $outsourcing = $outsourcing->paginate($perPage, ['*'], 'page', $page);
 
             return response()->json([
                 'success' => true,
