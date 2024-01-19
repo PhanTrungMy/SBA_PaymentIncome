@@ -19,11 +19,12 @@ class PaymentOrderController extends Controller
             $month = $request["month"];
             $year = $request["year"];
             $query = PaymentOrder::where('deleted_at', null);
-            $payment_order = $query->paginate($perPage);
+ 
             if ($month && $year) {
                 $query->whereMonth('payment_date', $month)
                     ->whereYear('payment_date', $year);
-            }
+            }         
+          $payment_order = $query->paginate($perPage);
             foreach ($payment_order as $payment) {
                 $resultPayments[] = [
                     "id" => $payment->id,
@@ -194,25 +195,38 @@ class PaymentOrderController extends Controller
 
     public function delete_payment_order(Request $request)
     {
-        $payment_order_id = request()->route('id');
-        $payment_order = PaymentOrder::findOrFail($payment_order_id);
-        if ($payment_order) {
-            $payment_order->deleted_at = now();
-            $payment_order->save();
-            return response()->json([
-                'success' => true,
-                'message' => 'Delete payment_order successfully',
-                'payment_order' => $payment_order
-            ], 200);
-        } else {
+        $payment_order_ids = $request->input('id');
+        if (empty($payment_order_ids)) {
             return response()->json([
                 'success' => false,
-                'message' => 'payment_order not found'
-            ], 404);
+                'message' => 'No payment_order ids provided'
+            ], 400);
         }
-        return response()->json([
-            'success' => false,
-            'message' => 'Internal server error'
-        ], 500);
+
+        try {
+            $payment_orders = PaymentOrder::whereIn('id', $payment_order_ids)->get();
+            if ($payment_orders->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No payment_orders found'
+                ], 404);
+            }
+
+            foreach ($payment_orders as $payment_order) {
+                $payment_order->deleted_at = now();
+                $payment_order->save();
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Delete payment_orders successfully',
+                'payment_orders' => $payment_orders
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error'
+            ], 500);
+        }
     }
 }
