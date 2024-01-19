@@ -8,18 +8,23 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends Model
 {
-    use HasFactory,SoftDeletes;
-    protected $fillable = [ 
+    use HasFactory, SoftDeletes;
+    protected $fillable = [
         'name',
         'group_id',
         'payment_count',
-        
+
     ];
-    public function group(){
+    public function group()
+    {
         return $this->belongsTo(Group::class);
     }
-    public function payments(){
+    public function payments()
+    {
         return $this->hasMany(Payment::class);
     }
-
+    public function balancesheet()
+    {
+        return $this->hasMany(BalanceSheet::class);
+    }
 }
