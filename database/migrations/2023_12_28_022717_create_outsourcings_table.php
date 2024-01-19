@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('company_name', 255);
             $table->float('jpy')->nullable();
             $table->float('usd')->nullable();
+            $table->float('vnd')->nullable();
             $table->unsignedBigInteger('exchange_rate_id');
             $table->string('outsourced_project', 255)->nullable();
             $table->dateTime('outsourced_date')->nullable();
