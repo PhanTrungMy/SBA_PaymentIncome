@@ -36,18 +36,27 @@ class BalanceSheetController extends Controller
             ], 400);
         }
 
-
+        $message = 'Create balance_sheets successfully';
         foreach ($request->balances as $balance) {
-            BalanceSheet::create([
-                'bs_month_year' => $request->month_year,
-                'amount' => $balance['amount'],
-                'category_id' => $balance['category_id']
-            ]);
+            $existing = BalanceSheet::where('bs_month_year', $request->month_year)
+                ->where('category_id', $balance['category_id'])
+                ->first();
+
+            if ($existing) {
+                $existing->update(['amount' => $balance['amount']]);
+                $message = 'Update balance_sheets successfully';
+            } else {
+                BalanceSheet::create([
+                    'bs_month_year' => $request->month_year,
+                    'amount' => $balance['amount'],
+                    'category_id' => $balance['category_id']
+                ]);
+            }
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Create balance_sheets successfully'
+            'message' => $message
         ], 200);
     }
 
