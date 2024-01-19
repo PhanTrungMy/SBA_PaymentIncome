@@ -157,25 +157,72 @@ class OutsourcingController extends Controller
         }
     }
 
-    public function delete_outsourcing($id)
-    {
-        try {
-            $outsourcing = Outsourcing::find($id);
+    // public function delete_outsourcing($id)
+    // {
+    //     try {
+    //         $outsourcing = Outsourcing::find($id);
 
-            if (!$outsourcing) {
-                return response()->json([
+    //         if (!$outsourcing) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Outsourcing not found'
+    //             ], 404);
+    //         }
+
+    //         $deletedOutsourcing = clone $outsourcing;
+    //         $outsourcing->delete();
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Update outsourcing successfully',
+    //             'outsourcing' => [
+    //                 'id' => $deletedOutsourcing->id,
+    //                 'user_id' => $deletedOutsourcing->user_id,
+    //                 'company_name' => $deletedOutsourcing->company_name,
+    //                 'jpy' => $deletedOutsourcing->jpy,
+    //                 'usd' => $deletedOutsourcing->usd,
+    //                 'vnd' => $deletedOutsourcing->vnd,
+    //                 'exchange_rate_id' => $deletedOutsourcing->exchange_rate_id,
+    //                 'outsourced_project' => $deletedOutsourcing->outsourced_project,
+    //                 'outsourced_date' => $deletedOutsourcing->outsourced_date,
+    //                 'created_at' => $deletedOutsourcing->created_at->toDateTimeString(),
+    //                 'updated_at' => $deletedOutsourcing->updated_at->toDateTimeString(),
+    //                 'deleted_at' => now()->toDateTimeString()
+    //             ]
+    //         ], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Internal server error'
+    //         ], 500);
+    //     }
+    // }
+    public function delete_outsourcing(Request $request)
+    {
+        $ids = $request->input('id');
+
+        if (!$ids || !is_array($ids)) {
+            return response()->json(
+                [
                     'success' => false,
                     'message' => 'Outsourcing not found'
-                ], 404);
-            }
+                ],
+                400
+            );
+        }
 
-            $deletedOutsourcing = clone $outsourcing;
-            $outsourcing->delete();
+        try {
+            $deleted = [];
+            foreach ($ids as $id) {
+                $outsourcing = Outsourcing::find($id);
+                if (!$outsourcing) {
+                    continue;
+                }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Update outsourcing successfully',
-                'outsourcing' => [
+                $deletedOutsourcing = clone $outsourcing;
+                $outsourcing->delete();
+
+                $deleted[] = [
                     'id' => $deletedOutsourcing->id,
                     'user_id' => $deletedOutsourcing->user_id,
                     'company_name' => $deletedOutsourcing->company_name,
@@ -188,9 +235,15 @@ class OutsourcingController extends Controller
                     'created_at' => $deletedOutsourcing->created_at->toDateTimeString(),
                     'updated_at' => $deletedOutsourcing->updated_at->toDateTimeString(),
                     'deleted_at' => now()->toDateTimeString()
-                ]
+                ];
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Deleted outsourcings',
+                'outsourcings' => $deleted
             ], 200);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Internal server error'
