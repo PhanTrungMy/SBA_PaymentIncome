@@ -26,8 +26,8 @@ class ExchangeRateController extends Controller
         $jpy_2 = [];
         $usd_2 = [];
 
-        if ($month == null && $year != null) {
-            $check_by_month_or_year->where("exchange_rate_month", "LIKE", "%$year-%");
+        if ($month == null && $year != null){
+            $check_by_month_or_year->where("exchange_rate_month","LIKE", "%$year-%");
         }
         if ($month != null && strlen($month) == 2 && $firstChar != 0 && $year == null) {
             $check_by_month_or_year->where("exchange_rate_month", "LIKE", "%-$month%");
@@ -66,7 +66,7 @@ class ExchangeRateController extends Controller
                 "message" => "Data not found",
             ], 200);
         }
-        if ($check_by_month_or_year->get() != null) {
+        if ($check_by_month_or_year->get() != null){
             return response()->json([
                 "success" => True,
                 "message" => "get exchange rates successfully",
@@ -76,7 +76,7 @@ class ExchangeRateController extends Controller
             ], 200);
         }
 
-        if ($month == null && $year == null) {
+        if ($month == null && $year == null){
             return response()->json([
                 "success" => True,
                 "message" => "get exchange rates successfully",
@@ -84,7 +84,8 @@ class ExchangeRateController extends Controller
                 "jpy" => array_sum($jpy_2),
                 "usd" => array_sum($usd_2)
             ], 200);
-        } else {
+        } 
+        else {
             return response()->json([
                 "success" => false,
                 "message" => "Internal server error"
@@ -115,8 +116,8 @@ class ExchangeRateController extends Controller
             ], 400);
         } else {
             try {
-                if ($id == null) {
-                    DB::table("exchange_rates")->insert([
+                if ($id == null){
+                    $result = DB::table("exchange_rates")->insertGetId([
                         "jpy" => $jpy,
                         "usd" => $usd,
                         "exchange_rate_month" => $formattedDate
@@ -125,6 +126,7 @@ class ExchangeRateController extends Controller
                         "success" => true,
                         "message" => "create exchange rate successfully",
                         "exchangeDate" => $exchangeDate,
+                        "id"=>$result,
                         "jpy" => $jpy,
                         "usd" => $usd,
                     ], 200);
@@ -132,12 +134,12 @@ class ExchangeRateController extends Controller
                 $check_id = DB::table("exchange_rates")->where("id", $id)->first();
                 if ($check_id) {
                     DB::table("exchange_rates")
-                        ->where("id", $id)
-                        ->update([
+                    ->where("id", $id)
+                    ->update([
                             "jpy" => $jpy,
                             "usd" => $usd,
                             "exchange_rate_month" => $formattedDate
-                        ]);
+                    ]);
                     return response()->json([
                         "success" => true,
                         "message" => "update exchange rate successfully",
