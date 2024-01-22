@@ -39,6 +39,12 @@ class PaymentController extends Controller
         $jpy = $payment->cost / $payment->exchange_rate->jpy;
         $totalUSD = $totalCost / $payment->exchange_rate->usd;
         $totalJPY = $totalCost / $payment->exchange_rate->jpy;
+    } else {
+        $usd = $payment->cost / $payment->exchange_rate->usd;
+        $jpy = $payment->cost / $payment->exchange_rate->jpy;
+        $totalUSD = $totalCost / $payment->exchange_rate->usd;
+        $totalJPY = $totalCost / $payment->exchange_rate->jpy;
+    }
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,

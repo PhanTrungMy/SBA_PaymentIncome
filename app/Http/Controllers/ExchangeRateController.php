@@ -20,12 +20,6 @@ class ExchangeRateController extends Controller
 
         $check_by_month_or_year = DB::table("exchange_rates");
 
-        $jpy = [];
-        $usd = [];
-
-        $jpy_2 = [];
-        $usd_2 = [];
-
         if ($month == null && $year != null){
             $check_by_month_or_year->where("exchange_rate_month","LIKE", "%$year-%");
         }
@@ -42,17 +36,7 @@ class ExchangeRateController extends Controller
             if (strlen($month) == 1 && $firstChar != 0) {
                 $check_by_month_or_year->where("exchange_rate_month", "LIKE", "%-0$month%")->where("exchange_rate_month", "LIKE", "%$year-%");
             }
-        }
-        foreach ($check_by_month_or_year->get() as $cost) {
-            $usd[] = $cost->usd;
-            $jpy[] = $cost->jpy;
-        }
-
-        foreach ($check as $cost_2) {
-            $usd_2[] = $cost_2->usd;
-            $jpy_2[] = $cost_2->jpy;
-        }
-
+        } 
         if ($check_by_month_or_year->get()->count() == 0 && $month != null) {
             return response()->json([
                 "success" => False,
@@ -71,8 +55,6 @@ class ExchangeRateController extends Controller
                 "success" => True,
                 "message" => "get exchange rates successfully",
                 "data" => $check_by_month_or_year->get(),
-                "jpy" => array_sum($jpy),
-                "usd" => array_sum($usd)
             ], 200);
         }
 
@@ -81,8 +63,7 @@ class ExchangeRateController extends Controller
                 "success" => True,
                 "message" => "get exchange rates successfully",
                 "data" => $check,
-                "jpy" => array_sum($jpy_2),
-                "usd" => array_sum($usd_2)
+
             ], 200);
         } 
         else {
