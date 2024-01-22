@@ -30,21 +30,16 @@ class PaymentController extends Controller
                     ->whereYear('payment_date', $year);
             }
             $totalCost = $query->sum('cost');
+            $totalUSD = $query->get()->reduce(function ($carry, $payment) {
+                return $carry + $payment->cost / $payment->exchange_rate->usd;
+            }, 0);
+            $totalJPY = $query->get()->reduce(function ($carry, $payment) {
+                return $carry + $payment->cost / $payment->exchange_rate->jpy;
+            }, 0);
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
-                $paymentDate = Carbon::parse($payment->payment_date);
-    $exchangeRateMonth = Carbon::parse($payment->exchange_rate->exchange_rate_month);
-    if ($paymentDate->format('Y-m') == $exchangeRateMonth->format('Y-m')) {
-        $usd = $payment->cost / $payment->exchange_rate->usd;
-        $jpy = $payment->cost / $payment->exchange_rate->jpy;
-        $totalUSD = $totalCost / $payment->exchange_rate->usd;
-        $totalJPY = $totalCost / $payment->exchange_rate->jpy;
-    } else {
-        $usd = $payment->cost / $payment->exchange_rate->usd;
-        $jpy = $payment->cost / $payment->exchange_rate->jpy;
-        $totalUSD = $totalCost / $payment->exchange_rate->usd;
-        $totalJPY = $totalCost / $payment->exchange_rate->jpy;
-    }
+                $jpy = $payment->cost / $payment->exchange_rate->jpy;
+                $usd = $payment->cost / $payment->exchange_rate->usd;
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
@@ -64,10 +59,9 @@ class PaymentController extends Controller
                         'name' => $payment->category->name,
                         'payment_count' => $payment->category->payment_count,
                     ],
+
                 ];
-            } 
             }
-           
             $pagination = [
                 'per_page' => $payments->perPage(),
                 'current_page' => $payments->currentPage(),
@@ -102,7 +96,6 @@ class PaymentController extends Controller
         }
     }
 
-    
     public function create_payments(Request $request)
     {
         try {
@@ -127,10 +120,10 @@ class PaymentController extends Controller
                     'message' => implode(', ', $errorMessage)
                 ], 400);
             }
-       
+
             $payment = Payment::create(
-                [         
-                    'id' => $request->id,  
+                [
+                    'id' => $request->id,
                     'user_id' => $request->user_id,
                     'name' => $request->name,
                     'cost' => $request->cost,
