@@ -28,12 +28,14 @@ class AnalyticController extends Controller
         $found_id = DB::table('payments')
             ->join('categories', 'payments.category_id', '=', 'categories.id')
             ->join('exchange_rates', 'payments.exchange_rate_id', '=', 'exchange_rates.id')
-            ->select('categories.id', 'categories.name', 'categories.payment_count', 'categories.group_id')
+            ->select('categories.id', 'categories.name', 'categories.payment_count', 'categories.group_id', 'categories.created_at', 'categories.updated_at', 'categories.deleted_at')
             ->where('payments.payment_date', 'like', '%' . $date . '%') 
             ->groupBy('category_id')
+            ->whereNull('categories.deleted_at')  
             ->selectRaw('SUM(payments.cost) AS cost_vnd, 
                              SUM(payments.cost / exchange_rates.usd) AS cost_usd,
                                 SUM(payments.cost / exchange_rates.jpy) AS cost_jpy')
+                            
             ->get();
         $total_cost_jpy = $found_id->sum('cost_jpy');
         $total_cost_vnd = $found_id->sum('cost_vnd');
