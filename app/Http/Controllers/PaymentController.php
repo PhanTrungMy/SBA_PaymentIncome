@@ -34,7 +34,6 @@ class PaymentController extends Controller
             foreach ($payments as $payment) {
                 $paymentDate = Carbon::parse($payment->payment_date);
     $exchangeRateMonth = Carbon::parse($payment->exchange_rate->exchange_rate_month);
-
     if ($paymentDate->format('Y-m') == $exchangeRateMonth->format('Y-m')) {
         $usd = $payment->cost / $payment->exchange_rate->usd;
         $jpy = $payment->cost / $payment->exchange_rate->jpy;
