@@ -32,8 +32,8 @@ class AnalyticController extends Controller
             ->where('payments.payment_date', 'like', '%' . $date . '%') 
             ->groupBy('category_id')
             ->selectRaw('SUM(payments.cost) AS cost_vnd, 
-                             SUM(payments.cost * exchange_rates.usd) AS cost_usd,
-                                SUM(payments.cost * exchange_rates.jpy) AS cost_jpy')
+                             SUM(payments.cost / exchange_rates.usd) AS cost_usd,
+                                SUM(payments.cost / exchange_rates.jpy) AS cost_jpy')
             ->get();
         $total_cost_jpy = $found_id->sum('cost_jpy');
         $total_cost_vnd = $found_id->sum('cost_vnd');
