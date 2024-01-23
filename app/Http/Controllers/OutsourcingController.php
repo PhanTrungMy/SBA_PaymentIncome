@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Outsourcing;
+use App\Models\ExchangeRate;
 use Illuminate\Http\Request;
-use Exception;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class OutsourcingController extends Controller
 {
@@ -78,8 +78,6 @@ class OutsourcingController extends Controller
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|integer',
                 'company_name' => 'required|string',
-                'jpy' => 'nullable',
-                'usd' => 'nullable',
                 'vnd' => 'required',
                 'exchange_rate_id' => 'required|integer',
                 'outsourced_project' => 'required|string',
@@ -88,19 +86,31 @@ class OutsourcingController extends Controller
 
             if ($validator->fails()) {
                 $errors = $validator->getMessageBag()->toArray();
-                $firstErrorField = array_key_first($errors); // Lấy tên trường đầu tiên có lỗi
-
-                // Chuyển đổi tên trường từ snake_case thành text bình thường, không viết hoa
+                $firstErrorField = array_key_first($errors);
                 $readableFieldName = str_replace('_', ' ', $firstErrorField);
-
                 return response()->json([
                     'success' => false,
                     'message' => $readableFieldName . ' is required.'
                 ], 400);
             }
 
+            $exchangeRate = ExchangeRate::find($request->input('exchange_rate_id'));
+            if (!$exchangeRate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Exchange rate not found'
+                ], 404);
+            }
+
+            $vndAmount = $request->input('vnd');
+            $jpyValue = $vndAmount / $exchangeRate->jpy;
+            $usdValue = $vndAmount / $exchangeRate->usd;
+
+
             $outsourcing = new Outsourcing();
             $outsourcing->fill($request->all());
+            $outsourcing->jpy = $jpyValue;
+            $outsourcing->usd = $usdValue;
             $outsourcing->save();
 
             return response()->json([
@@ -116,16 +126,12 @@ class OutsourcingController extends Controller
         }
     }
 
-
-
     public function update_outsourcing(Request $request, $id)
     {
         try {
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|integer',
                 'company_name' => 'required|string',
-                'jpy' => 'nullable',
-                'usd' => 'nullable',
                 'vnd' => 'required',
                 'exchange_rate_id' => 'required|integer',
                 'outsourced_project' => 'required|string',
@@ -136,23 +142,34 @@ class OutsourcingController extends Controller
                 $errors = $validator->getMessageBag()->toArray();
                 $firstErrorField = array_key_first($errors);
                 $readableFieldName = str_replace('_', ' ', $firstErrorField);
-
                 return response()->json([
                     'success' => false,
                     'message' => $readableFieldName . ' is required.'
                 ], 400);
             }
 
-            $outsourcing = Outsourcing::find($id);
+            $exchangeRate = ExchangeRate::find($request->input('exchange_rate_id'));
+            if (!$exchangeRate) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Exchange rate not found'
+                ], 404);
+            }
 
+            $vndAmount = $request->input('vnd');
+            $jpyValue = $vndAmount / $exchangeRate->jpy;
+            $usdValue = $vndAmount / $exchangeRate->usd;
+
+            $outsourcing = Outsourcing::find($id);
             if (!$outsourcing) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Outsourcing not found'
                 ], 404);
             }
-
             $outsourcing->fill($request->all());
+            $outsourcing->jpy = $jpyValue;
+            $outsourcing->usd = $usdValue;
             $outsourcing->save();
 
             return response()->json([

@@ -358,19 +358,26 @@ class DataTableController extends Controller
     }
     public function updateOrCreateBalanceSheet(Request $request)
     {
-        $bs_month_year = $request->input('bs_month_year');
-        $category_id = $request->input('category_id');
-        $amount = $request->input('amount');
+        $balanceSheetsData = $request->all();
 
-        if (strlen($bs_month_year) == 4) {
-            $balanceSheet = BalanceSheet::updateOrCreate(
-                ['bs_month_year' => $bs_month_year, 'category_id' => $category_id],
-                ['amount' => $amount]
-            );
+        $responses = [];
 
-            return response()->json($balanceSheet, 200);
-        } else {
-            return response()->json(['error' => 'Invalid bs_month_year format. It should be in yyyy format.'], 400);
+        foreach ($balanceSheetsData as $data) {
+            $bs_month_year = $data['bs_month_year'];
+            $category_id = $data['category_id'];
+            $amount = $data['amount'];
+
+            if (strlen($bs_month_year) == 4) {
+                $balanceSheet = BalanceSheet::updateOrCreate(
+                    ['bs_month_year' => $bs_month_year, 'category_id' => $category_id],
+                    ['amount' => $amount]
+                );
+                array_push($responses, $balanceSheet);
+            } else {
+                array_push($responses, ['error' => 'Invalid bs_month_year format. It should be in yyyy format.']);
+            }
         }
+
+        return response()->json($responses, 200);
     }
 }
