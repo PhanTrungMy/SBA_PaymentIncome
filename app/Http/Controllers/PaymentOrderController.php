@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-
+use App\Models\ExchangeRate;
 use App\Models\PaymentOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +32,7 @@ class PaymentOrderController extends Controller
                     'company_name' => $payment->company_name,
                     'jpy' => $payment->jpy,
                     'vnd' => $payment->vnd,
-                    'usd' => $payment->usd,
+                    'usd' =>$payment->usd,
                     'exchange_rate_id' => $payment->exchange_rate_id,
                     'payment_date' => $payment->payment_date,
                     'created_at' => $payment->created_at,
@@ -114,15 +114,16 @@ class PaymentOrderController extends Controller
                     ], 400);
                 }
             }
-            
-
+            $exchangeRate = ExchangeRate::find($request->exchange_rate_id);
+            $usd = $request->vnd / $exchangeRate->usd;
+            $jpy = $request->vnd / $exchangeRate->jpy;
             $payment_order = PaymentOrder::create(
                 [
                     'user_id' => $request->user_id,
                     'company_name' => $request->company_name,
-                    'jpy' => $request->jpy,
+                    'jpy' => $jpy,
                     'vnd' => $request->vnd,
-                    'usd' => $request->usd,
+                    'usd' => $usd,
                     'exchange_rate_id' => $request->exchange_rate_id,
                     'payment_date' => $request->payment_date,
                     'created_at' => $request->created_at,
@@ -173,7 +174,13 @@ class PaymentOrderController extends Controller
         $new_payment_order = request()->all();
         $payment_order_id = request()->route('id');
         $payment_order = PaymentOrder::findOrFail($payment_order_id);
+        $exchangeRate = ExchangeRate::find($payment_order->exchange_rate_id);
+        $usd = $payment_order->vnd / $exchangeRate->usd;
+        $jpy = $payment_order->vnd / $exchangeRate->jpy;
+        $payment_order->usd = $usd;
+        $payment_order->jpy = $jpy;
         $payment_order->save();
+
         if ($payment_order) {
             $payment_order->update($new_payment_order);
             return response()->json([
@@ -181,7 +188,8 @@ class PaymentOrderController extends Controller
                 'message' => 'Update payment_order successfully',
                 'payment_order' => $payment_order
             ], 200);
-        } else {
+        }
+        else {
             return response()->json([
                 'success' => false,
                 'message' => 'payment_order not found'

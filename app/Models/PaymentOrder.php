@@ -23,7 +23,7 @@ class PaymentOrder extends Model
     public function user(){
         return $this->belongsTo(User::class);
     }
-    public function exchange_rates(){
+    public function exchange_rate(){
         return $this->belongsTo(ExchangeRate::class);
     }
 }
