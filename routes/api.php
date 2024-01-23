@@ -62,7 +62,7 @@ Route::group([
     Route::get('', [PaymentOrderController::class, "get_all_payment_orders"])->name('payments');
     Route::post('', [PaymentOrderController::class, "create_payment_order"])->name('create_payment_orders');
     Route::put('{id}', [PaymentOrderController::class, "update_payment_order"])->name('update_payment_orders');
-    Route::delete('{id}', [PaymentOrderController::class, "delete_payment_order"])->name('delete_payment_orders');
+    Route::delete('', [PaymentOrderController::class, "delete_payment_order"])->name('delete_payment_orders');
 });
 Route::group([
     'prefix' => 'payment_orders',
@@ -85,7 +85,7 @@ Route::group([
     Route::get('', [PaymentController::class, "get_all_payments"])->name('get_payments');
     Route::post('', [PaymentController::class, "create_payments"])->name('create_payments');
     Route::put('{id}', [PaymentController::class, "update_payments"])->name('update_payments');
-    Route::delete('{id}', [PaymentController::class, "delete_payments"])->name('delete_payments');
+    Route::delete('', [PaymentController::class, "delete_payments"])->name('delete_payments');
 });
 Route::group([
     'prefix' => 'payments',

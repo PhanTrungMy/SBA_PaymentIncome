@@ -24,18 +24,18 @@ class OrderController extends Controller
                 $perPage = 10;
             }
             $currentPage = request()->query('page', $Page);
-            
-            if ($month != null && $year != null){
-                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->whereMonth("order_date", "=", $month)->orderBy('id', 'asc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+
+            if ($month != null && $year != null) {
+                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
-            if ($month == null && $year != null){
-                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->orderBy('id', 'asc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+            if ($month == null && $year != null) {
+                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
-            if ($month != null && $year == null){
-                $data_1 = Order::whereNull('deleted_at')->whereMonth("order_date", "=", $month)->orderBy('id', 'asc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+            if ($month != null && $year == null) {
+                $data_1 = Order::whereNull('deleted_at')->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
-            if ($month == null && $year == null){
-                $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'asc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+            if ($month == null && $year == null) {
+                $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($data_1->count() > 0) {
                 return response()->json([
@@ -50,6 +50,12 @@ class OrderController extends Controller
                     "orders" => $data_1->items(),
                 ], 200);
             }
+            else{
+                return response()->json([
+                    "success" => false,
+                    "message" => "Data not found"
+                ], 500);
+            }
         } catch (\Exception $e) {
             return response()->json([
                 "success" => false,
@@ -61,15 +67,15 @@ class OrderController extends Controller
     function Get_Order_By_ID(Request $request, $id)
     {
         try {
-            $OrderByID = DB::table("orders")->where("id", $id)->get();
-            if ($OrderByID->count() > 0) {
+            $OrderByID = DB::table("orders")->where("id", $id)->first();
+            if ($OrderByID != null) {
                 return response()->json([
                     "success" => true,
                     "message" => "Get order successfully",
                     "order" => $OrderByID,
                 ], 200);
             }
-            if ($OrderByID->count() == 0) {
+            if ($OrderByID == null) {
                 return response()->json([
                     "success" => false,
                     "message" => "Order not found"
@@ -107,7 +113,7 @@ class OrderController extends Controller
         ]);
 
         $check_user_id = DB::table("users")->where("id", $user_id)->get();
-        $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->get();
+        $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
         $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
         $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
 
@@ -115,40 +121,42 @@ class OrderController extends Controller
             if ($check_exchange_rate_id != null) {
                 if ($order_create->fails()) {
                     return response()->json([
-                        "success"=>false,
-                        "message"=> $order_create->errors(),
+                        "success" => false,
+                        "message" => $order_create->errors(),
                     ], 400);
-                }if ($order_create_2->fails()){
-                        return response()->json([
-                            "success"=>false,
-                            "message"=>"Internal server error"
+                }
+                if ($order_create_2->fails()) {
+                    return response()->json([
+                        "success" => false,
+                        "message" => "Internal server error"
                     ], 500);
                 } else {
                     $originalDate = $request->input('order_date');
-                    $formattedDate = Carbon::createFromFormat('d-m-Y', $originalDate)->format('Y-m-d');
-                    $request->merge(['order_date' => $formattedDate]);
+                    // $formattedDate = Carbon::createFromFormat('d-m-Y', $originalDate)->format('Y-m-d');
+                    $request->merge(['order_date' => $originalDate]);
                     $save = DB::table("orders")->insertGetId([
                         "user_id" => $user_id,
                         "company_name" => $request["company_name"],
                         "vnd" => $request["vnd"],
                         "order_date" => $request["order_date"],
                         "exchange_rate_id" => $request["exchange_rate_id"],
-                        "jpy"=> $jpn,
-                        "usd"=> $usd,
+                        "jpy" => $jpn,
+                        "usd" => $usd,
                         "created_at" => now(),
-                        "updated_at"=>now()
+                        "updated_at" => now()
                     ]);
                     $get_save = DB::table("orders")->find($save);
                     return response()->json([
                         "success" => true,
                         "message" => "Create order successfully",
-                        "order" => $get_save,
+                        "order" => $get_save
                     ], 200);
                 }
             }
         }
     }
-    function Update_Order(Request $request, $id){
+    function Update_Order(Request $request, $id)
+    {
         $user_id = $request["user_id"];
         $exchange_rate_id = $request["exchange_rate_id"];
 
@@ -189,16 +197,15 @@ class OrderController extends Controller
                     ], 500);
                 }
                 $check_order = DB::table("orders")->where("id", $id)->first();
-                if ($check_order == null){
+                if ($check_order == null) {
                     return response()->json([
-                        "success"=>false,
-                        "message"=>"Order not found"
+                        "success" => false,
+                        "message" => "Order not found"
                     ], 404);
-                }
-                else {
+                } else {
                     $originalDate = $request->input('order_date');
-                    $formattedDate = Carbon::createFromFormat('d-m-Y', $originalDate)->format('Y-m-d');
-                    $request->merge(['order_date' => $formattedDate]);
+                    // $formattedDate = Carbon::createFromFormat('d-m-Y', $originalDate)->format('Y-m-d');
+                    $request->merge(['order_date' => $originalDate]);
                     $check_order = DB::table("orders")->where("id", $id);
                     $check_order->update([
                         "user_id" => $user_id,
@@ -220,7 +227,8 @@ class OrderController extends Controller
             }
         }
     }
-    function Delete_Order(Request $request){
+    function Delete_Order(Request $request)
+    {
         if ($request->has("id")) {
             $id = $request->input("id");
             $count = is_array($id) ? count($id) : 1;
@@ -249,7 +257,7 @@ class OrderController extends Controller
                 foreach ($id as $key) {
                     $delete_order_check = DB::table("orders")->where("id", $key)->first();
                     $delete_order = DB::table("orders")->where("id", $key);
-                    if($delete_order_check != null){
+                    if ($delete_order_check != null) {
                         $delete_order->update([
                             "deleted_at" => now(),
                         ]);
@@ -257,7 +265,7 @@ class OrderController extends Controller
                     }
                 }
                 return response()->json([
-                    "success"=>true,
+                    "success" => true,
                     "message" => "Delete order successfully",
                     "orders" => $arr_delete_not_null,
                 ]);

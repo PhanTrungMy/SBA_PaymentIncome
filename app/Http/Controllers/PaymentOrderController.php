@@ -18,7 +18,7 @@ class PaymentOrderController extends Controller
             $perPage = in_array($perPage, [5, 10, 20]) ? $perPage : 5;
             $month = $request["month"];
             $year = $request["year"];
-            $query = PaymentOrder::where('deleted_at', null);
+            $query = PaymentOrder::where('deleted_at', null)->orderBy('created_at', 'desc');
  
             if ($month && $year) {
                 $query->whereMonth('payment_date', $month)
@@ -85,10 +85,11 @@ class PaymentOrderController extends Controller
     }
     public function create_payment_order(Request $request)
     {
+       
         try {
             $validator = Validator::make($request->all(), [
                 'company_name' => 'required|string',
-                'vnd' => 'required|float',
+                'vnd' => 'required',
                 'payment_date' => 'required',
                 'exchange_rate_id' => 'required',
             ]);
@@ -113,6 +114,7 @@ class PaymentOrderController extends Controller
                     ], 400);
                 }
             }
+            
 
             $payment_order = PaymentOrder::create(
                 [
@@ -153,7 +155,7 @@ class PaymentOrderController extends Controller
         try{
         $validated = Validator::make($request->all(), [
             'company_name' => 'required|string',
-            'vnd' => 'required|float',
+            'vnd' => 'required',
             'payment_date' => 'required',
             'exchange_rate_id' => 'required',
         ]);

@@ -225,25 +225,29 @@ class PaymentController extends Controller
             ], 500);
         }
     }
-    public function delete_payments(Request $request, $id)
+
+    public function delete_payments(Request $request)
     {
         try {
-            $payment = Payment::findOrFail($id);
-            if (!$payment) {
+            $ids = $request->input('id');
+            $payments = Payment::whereIn('id', $ids)->get();
+            
+            if ($payments->isEmpty()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Not found payment',
+                    'message' => 'No payments found',
                 ], 404);
             }
-            $payment->deleted_at = now();
-            $payment->save();
-            $category = Category::where('id', $payment->category_id)->decrement('payment_count');
-            if ($category) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Update payment successfully',
-                ], 200);
-            }
+            
+            Payment::whereIn('id', $ids)->update(['deleted_at' => now()]);
+            
+            $categoryIds = $payments->pluck('category_id')->unique();
+            Category::whereIn('id', $categoryIds)->decrement('payment_count', count($ids));
+            
+            return response()->json([
+                'success' => true,
+                'message' => 'Payments deleted successfully',
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
