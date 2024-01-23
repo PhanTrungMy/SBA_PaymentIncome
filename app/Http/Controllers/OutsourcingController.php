@@ -78,12 +78,12 @@ class OutsourcingController extends Controller
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|integer',
                 'company_name' => 'required|string',
-                'jpy' => 'nullable|float',
-                'usd' => 'nullable|float',
-                'vnd' => 'required|float',
+                'jpy' => 'nullable',
+                'usd' => 'nullable',
+                'vnd' => 'required',
                 'exchange_rate_id' => 'required|integer',
                 'outsourced_project' => 'required|string',
-                'outsourced_date' => 'nullable|date',
+                'outsourced_date' => 'required|date',
             ]);
 
             if ($validator->fails()) {
@@ -124,12 +124,12 @@ class OutsourcingController extends Controller
             $validator = Validator::make($request->all(), [
                 'user_id' => 'required|integer',
                 'company_name' => 'required|string',
-                'jpy' => 'nullable|float',
-                'usd' => 'nullable|float',
-                'vnd' => 'required|float',
+                'jpy' => 'nullable',
+                'usd' => 'nullable',
+                'vnd' => 'required',
                 'exchange_rate_id' => 'required|integer',
                 'outsourced_project' => 'required|string',
-                'outsourced_date' => 'nullable|date',
+                'outsourced_date' => 'required|date',
             ]);
 
             if ($validator->fails()) {
