@@ -13,7 +13,7 @@ class OrderController extends Controller
     function Get_all_order(Request $request)
     {
         try {
-            $perPage = $request->input('perPage', 10);
+            $perPage = $request->input('perPage', 5);
             $perPageOptions = [10, 20];
             $Page = $request["Page"];
 
@@ -21,7 +21,7 @@ class OrderController extends Controller
             $year = $request["year"];
 
             if (!in_array($perPage, $perPageOptions)) {
-                $perPage = 10;
+                $perPage = 5;
             }
             $currentPage = request()->query('page', $Page);
 
@@ -131,14 +131,14 @@ class OrderController extends Controller
                         "message" => "Internal server error"
                     ], 500);
                 } else {
-                    $originalDate = $request->input('order_date');
+                    $originalDate = $request["order_date"];
                     // $formattedDate = Carbon::createFromFormat('d-m-Y', $originalDate)->format('Y-m-d');
-                    $request->merge(['order_date' => $originalDate]);
+                    // $request->merge(['order_date' => $formattedDate]);
                     $save = DB::table("orders")->insertGetId([
                         "user_id" => $user_id,
                         "company_name" => $request["company_name"],
                         "vnd" => $request["vnd"],
-                        "order_date" => $request["order_date"],
+                        "order_date" => $originalDate,
                         "exchange_rate_id" => $request["exchange_rate_id"],
                         "jpy" => $jpn,
                         "usd" => $usd,
@@ -205,13 +205,13 @@ class OrderController extends Controller
                 } else {
                     $originalDate = $request->input('order_date');
                     // $formattedDate = Carbon::createFromFormat('d-m-Y', $originalDate)->format('Y-m-d');
-                    $request->merge(['order_date' => $originalDate]);
+                    // $request->merge(['order_date' => $formattedDate]);
                     $check_order = DB::table("orders")->where("id", $id);
                     $check_order->update([
                         "user_id" => $user_id,
                         "company_name" => $request["company_name"],
                         "vnd" => $request["vnd"],
-                        "order_date" => $request["order_date"],
+                        "order_date" => $originalDate,
                         "exchange_rate_id" => $request["exchange_rate_id"],
                         "jpy" => $jpn,
                         "usd" => $usd,
