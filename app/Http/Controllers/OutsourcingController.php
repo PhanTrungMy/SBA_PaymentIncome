@@ -16,7 +16,7 @@ class OutsourcingController extends Controller
             $perPage = $request->query('per_page', 5);
             $page = $request->query('page', 1);
 
-            $outsourcing = Outsourcing::whereNull('deleted_at');
+            $outsourcing = Outsourcing::whereNull('deleted_at')->orderBy('created_at', 'desc');
 
             if ($request->has('month')) {
                 $month = $request->query('month');
