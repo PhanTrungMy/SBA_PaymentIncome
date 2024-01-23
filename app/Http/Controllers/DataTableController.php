@@ -333,4 +333,44 @@ class DataTableController extends Controller
         }
         return $result;
     }
+    public function getAmounts_byyear(Request $request)
+    {
+        $year = $request->input('y') - 1;
+
+        $categories = DB::table('categories')
+            ->join('balance_sheets', 'categories.id', '=', 'balance_sheets.category_id')
+            ->select('categories.id as category_id', 'categories.name as category_name', 'balance_sheets.id as balance_sheet_id', DB::raw('SUM(balance_sheets.amount) as total_amount'))
+            ->whereRaw('LENGTH(balance_sheets.bs_month_year) = 4')
+            ->where('balance_sheets.bs_month_year', '=', $year)
+            ->groupBy('categories.id', 'categories.name', 'balance_sheets.id')
+            ->get();
+
+        $response = $categories->map(function ($category) use ($year) {
+            return [
+                'id' => $category->balance_sheet_id,
+                'bs_month_year' => $year,
+                'category_id' => $category->category_id,
+                'category_name' => $category->category_name,
+                'total_amount' => $category->total_amount,
+            ];
+        });
+        return response()->json($response, 200);
+    }
+    public function updateOrCreateBalanceSheet(Request $request)
+    {
+        $bs_month_year = $request->input('bs_month_year');
+        $category_id = $request->input('category_id');
+        $amount = $request->input('amount');
+
+        if (strlen($bs_month_year) == 4) {
+            $balanceSheet = BalanceSheet::updateOrCreate(
+                ['bs_month_year' => $bs_month_year, 'category_id' => $category_id],
+                ['amount' => $amount]
+            );
+
+            return response()->json($balanceSheet, 200);
+        } else {
+            return response()->json(['error' => 'Invalid bs_month_year format. It should be in yyyy format.'], 400);
+        }
+    }
 }

@@ -182,6 +182,17 @@ Route::group([
     Route::get('', [DataTableController::class, 'get_data_table_bs']);
 });
 Route::group([
+    'prefix' => 'getDatayear',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // getDateforyear
+    Route::get('', [DataTableController::class, 'getAmounts_byyear']);
+    Route::post('', [DataTableController::class, 'updateOrCreateBalanceSheet']);
+});
+Route::group([
     'prefix' => 'exchangeRate',
     'middleware' => [
         'checkLogin',
