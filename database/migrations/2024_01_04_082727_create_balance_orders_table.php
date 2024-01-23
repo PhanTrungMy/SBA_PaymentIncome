@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('balance_sheets', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->float('amount');
+            $table->bigInteger('amount');
             $table->string('bs_month_year', 50);
             $table->unsignedBigInteger('category_id');
             $table->timestamps();

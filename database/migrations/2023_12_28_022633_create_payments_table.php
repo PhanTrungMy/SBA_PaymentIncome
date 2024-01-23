@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->string('name', 255)->nullable();
-            $table->decimal('cost',20 ,4)->nullable();
+            $table->bigInteger('cost')->nullable();
             $table->string('currency_type', 20)->default('jpy');
             $table->string('note', 255)->nullable();
             $table->string('invoice', 255)->nullable();
