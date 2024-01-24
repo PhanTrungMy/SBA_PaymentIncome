@@ -42,6 +42,7 @@ class CategoryController extends Controller
                 'id' => $category->id,
                 'name' => $category->name,
                 'group_id' => $category->group_id,
+                'group_name' => $category->group->name,
                 'payment_count' => $category->payment_count,
                 'created_at' => $category->created_at->toDateTimeString(),
                 'updated_at' => $category->updated_at->toDateTimeString(),
