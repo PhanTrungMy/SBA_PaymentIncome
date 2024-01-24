@@ -339,7 +339,7 @@ class DataTableController extends Controller
 
         $categories = DB::table('categories')
             ->join('balance_sheets', 'categories.id', '=', 'balance_sheets.category_id')
-            ->select('categories.id as category_id', 'categories.name as category_name', 'balance_sheets.id as balance_sheet_id', DB::raw('SUM(balance_sheets.amount) as total_amount'))
+            ->select('categories.id as category_id', 'categories.name as category_name', 'balance_sheets.id as balance_sheet_id', DB::raw('SUM(balance_sheets.amount) as amount'))
             ->whereRaw('LENGTH(balance_sheets.bs_month_year) = 4')
             ->where('balance_sheets.bs_month_year', '=', $year)
             ->groupBy('categories.id', 'categories.name', 'balance_sheets.id')
@@ -351,7 +351,7 @@ class DataTableController extends Controller
                 'bs_month_year' => $year,
                 'category_id' => $category->category_id,
                 'category_name' => $category->category_name,
-                'total_amount' => $category->total_amount,
+                'amount' => $category->amount,
             ];
         });
         return response()->json($response, 200);
