@@ -13,8 +13,7 @@ class GroupController extends Controller
         try {
             $resultGroups = [];
             $perPage = $request->query('per_page') ?? 10;
-            $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
-            $curPage = $request->query('page') ?? 1;
+            // $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
             $name = $request->query('name');
             $reportType = $request->query('report_type');
 
@@ -51,6 +50,21 @@ class GroupController extends Controller
                 'total_result' => $groups->total(),
                 'pagination' => $pagination,
                 'groups' => $resultGroups,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
+    public function get_all_group(){
+        try {
+            $groups = Group::all();
+            return response()->json([
+                'success' => true,
+                'message' => 'Get all groups successfully',
+                'groups' => $groups,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
