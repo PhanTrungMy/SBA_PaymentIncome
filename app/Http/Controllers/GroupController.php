@@ -58,7 +58,7 @@ class GroupController extends Controller
             ], 500);
         }
     }
-    public function get_all_group(){
+public function get_all_group(){
         try {
             $groups = Group::all();
             return response()->json([
@@ -72,5 +72,5 @@ class GroupController extends Controller
                 'message' => 'Internal server error',
             ], 500);
         }
-    }
+}
 }
