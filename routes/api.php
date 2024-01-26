@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AnalyticController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentOrderController;
@@ -204,4 +205,17 @@ Route::group([
     // Exchangrate
     Route::get('', [ExchangeRateController::class, 'ExchangeRateByMonthYear']);
     Route::post('', [ExchangeRateController::class, "CreateExchangeRateOrEditExchangeRate"]);
+});
+
+
+Route::group([
+    'prefix' => 'Export',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // Export
+    Route::get('/BS', [ExportController::class, 'get_data_table_bs']);
+    Route::get('/PL', [ExportController::class, "get_data_table_pl"]);
 });

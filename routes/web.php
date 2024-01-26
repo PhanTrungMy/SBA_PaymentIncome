@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,3 +17,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get("/exportBS", [ExportController::class, "get_data_table_bs"]);
+
+Route::get("/exportPL", [ExportController::class, "get_data_table_pl"]);
