@@ -136,11 +136,6 @@ class PaymentController extends Controller
                     'payment_date' => $request->payment_date,
                 ]
             );
-            return response()->json([
-                'success' => true,
-                'message' => 'Create new payment successfully',
-                'payment' => $payment
-            ], 200);
             Category::where('id', $request->category_id)->increment('payment_count');
             $payment->save();
             if ($payment) {

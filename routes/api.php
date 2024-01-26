@@ -50,6 +50,8 @@ Route::group([
 ], function () {
     // groups all
     Route::get('', [GroupController::class, 'get_all_groups'])->name('groups');
+    Route::get('/all', [GroupController::class, 'get_all_group'])->name('groups');
+
 });
 Route::group([
     'prefix' => 'payment_orders',
