@@ -148,16 +148,20 @@ class ExportController extends Controller
 
     public function get_data_table_bs(Request $request)
     {
-        // $year = $request->input('y', date('Y'));
-        // $type = $request->input('type', 'bs');
+        $year = $request->input('y', date('Y'));
+        $type = $request->input('type', 'bs');
+        $language = $request->input("language");
 
-        $year = 2023;
-        $type = "bs";
+        if($language == "jp"){
+            $responseData = $this->fetchAndFormatDatabs($year, $type);
 
-        $responseData = $this->fetchAndFormatDatabs($year, $type);
+            // return view("Custom", ["data" => $responseData]);
+            return Excel::download(new RequestExport($responseData), 'file.xlsx');
+        }
 
-        // return view("Custom", ["data" => $responseData]);
-        return Excel::download(new RequestExport($responseData), 'file.xlsx');
+        // $year = 2023;
+        // $type = "bs";
+
     }
     private function fetchAndFormatDatabs($year, $type)
     {
