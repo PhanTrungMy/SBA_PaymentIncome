@@ -2,13 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -29,26 +27,33 @@ class AuthController extends Controller
         }
  
         if (! $token = auth('api')->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'username or password is not correct'], 401);
         }
         return $this->createNewToken($token);
     }
+    public function refresh() {
+        return $this->createNewToken(auth('api')->refresh());
+        
+    }
+
     public function logout()
     {
-        auth()->logout();
+        Auth::logout();
 
-        return response()->json(['message' => 'User successfully signed out']);
+        return response()->json([
+            'message' => 'Logged out successfully',
+        ], 200);
     }
-   protected function createNewToken($token){
-
-    $ttl = config('jwt.ttl'); // Replace 'jwt.ttl' with your JWT TTL configuration key
-
+protected function createNewToken($token)
+{
+    $user = auth('api')->user();
+    $user->makeHidden(['created_at', 'updated_at']);
     return response()->json([
+        'message' => 'User successfully signed in',
         'access_token' => $token,
         'token_type' => 'bearer',
-        'expires_in' => $ttl * 60, // Assuming the TTL is in minutes
+        'expires_in' => auth('api')->factory()->getTTL() * 60 * 24, // Increase the time by multiplying with 24 (for 24 hours)
         'user' => auth('api')->user()
     ]);
-
-}
+}  
 }

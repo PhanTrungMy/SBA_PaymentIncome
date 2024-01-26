@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Group extends Model
+class BalanceSheet extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'name',
-        'reportType',
-
+        'amount',
+        'bs_month_year',
+        'category_id',
     ];
-    public function categories()
+    public function category()
     {
-        return $this->hasMany(Category::class);
+        return $this->belongsTo(Category::class);
     }
 }
