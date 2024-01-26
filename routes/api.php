@@ -10,6 +10,7 @@ use App\Http\Controllers\BalanceSheetController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DataTableController;
 use App\Http\Controllers\ExchangeRateController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OutsourcingController;
 /*
@@ -204,4 +205,16 @@ Route::group([
     // Exchangrate
     Route::get('', [ExchangeRateController::class, 'ExchangeRateByMonthYear']);
     Route::post('', [ExchangeRateController::class, "CreateExchangeRateOrEditExchangeRate"]);
+});
+
+Route::group([
+    'prefix' => 'Export',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken',
+    ],
+], function () {
+    // Export
+    Route::get('/BS', [ExportController::class, 'get_data_table_bs']);
+    Route::get('/PL', [ExportController::class, "get_data_table_pl"]);
 });
