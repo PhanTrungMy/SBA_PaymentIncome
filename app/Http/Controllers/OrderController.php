@@ -52,9 +52,12 @@ class OrderController extends Controller
             }
             else{
                 return response()->json([
-                    "success" => false,
-                    "message" => "Data not found"
-                ], 500);
+                    'success' => true,
+                    'message' => 'No data found',
+                    'total_result' => 0,
+                    'pagination' => null,
+                    'orders' => [],
+                ], 200);
             }
         } catch (\Exception $e) {
             return response()->json([
