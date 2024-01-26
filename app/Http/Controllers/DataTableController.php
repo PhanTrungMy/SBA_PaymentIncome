@@ -208,6 +208,7 @@ class DataTableController extends Controller
                 case 17:
                     if (isset($totalMonths[16])) {
                         $groupData['total_month'] = $totalMonths[16];
+                        $totalMonths[17] = $totalMonths[16];
                     }
                 case 18:
                     if (isset($totalMonths[17]) and isset($totalMonths[15])) {
@@ -218,10 +219,12 @@ class DataTableController extends Controller
                 case 20:
                     if (isset($totalMonths[19])) {
                         $groupData['total_month'] = $totalMonths[19];
+                        $totalMonths[20] = $totalMonths[19];
                     }
                 case 21:
                     if (isset($totalMonths[20])) {
                         $groupData['total_month'] = $totalMonths[20];
+                        $totalMonths[21] = $totalMonths[20];
                     }
                 case 23:
                     if (isset($totalMonths[18]) && isset($totalMonths[21])) {
@@ -232,10 +235,12 @@ class DataTableController extends Controller
                 case 25:
                     if (isset($totalMonths[23])) {
                         $groupData['total_month'] = $totalMonths[23];
+                        $totalMonths[25] = $totalMonths[23];
                     }
                 case 26:
                     if (isset($totalMonths[25])) {
                         $groupData['total_month'] = $totalMonths[25];
+                        $totalMonths[26] = $totalMonths[25];
                     }
 
                 case 27:
@@ -245,8 +250,9 @@ class DataTableController extends Controller
                     }
                     break;
                 case 28:
-                    if (isset($totalMonths[25])) {
+                    if (isset($totalMonths[28])) {
                         $groupData['total_month'] = $totalMonths[27];
+                        $totalMonths[28] = $totalMonths[27];
                     }
                 case 29:
                     if (isset($totalMonths[28]) and isset($totalMonths[21])) {

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -16,12 +15,14 @@ class CategoryController extends Controller
         $perPage = $request->query('per_page', 10);
         $page = $request->query('page', 1);
         $name = $request->query('name');
+        $groupName = $request->query('group_name');
         $groupId = $request->query('group_id');
         $reportType = $request->query('report_type');
+        $searchTerm = $request->query('search');
 
         $query = Category::with('group')
             ->join('groups', 'categories.group_id', '=', 'groups.id')
-            ->select('categories.*', 'groups.report_type');
+            ->select('categories.*', 'groups.report_type', 'groups.name as group_name');
 
         if (!empty($name)) {
             $query->where('categories.name', 'LIKE', "%{$name}%");
@@ -34,6 +35,18 @@ class CategoryController extends Controller
         if (!empty($reportType)) {
             $query->where('groups.report_type', $reportType);
         }
+        if (!empty($groupName)) {
+            $query->where('groups.name', $groupName);
+        }
+
+
+        if (!empty($searchTerm)) {
+            $query->where(function ($query) use ($searchTerm) {
+                $query->where('categories.name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('groups.name', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('groups.report_type', 'LIKE', "%{$searchTerm}%");
+            });
+        }
 
         $categories = $query->paginate($perPage, ['*'], 'page', $page);
 
@@ -42,6 +55,7 @@ class CategoryController extends Controller
                 'id' => $category->id,
                 'name' => $category->name,
                 'group_id' => $category->group_id,
+                'group_name' => $category->group_name,
                 'payment_count' => $category->payment_count,
                 'created_at' => $category->created_at->toDateTimeString(),
                 'updated_at' => $category->updated_at->toDateTimeString(),
@@ -62,7 +76,6 @@ class CategoryController extends Controller
             'categories' => $transformedCategories
         ], 200);
     }
-
     public function catogory_show_id($id)
     {
         try {
