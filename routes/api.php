@@ -216,5 +216,6 @@ Route::group([
     ],
 ], function () {
     // Export
-    Route::get('/BSJP', [ExportController::class, 'get_data_table_bs']);
+    Route::get('/BS', [ExportController::class, 'get_data_table_bs']);
+    Route::get('/PL', [ExportController::class, "get_data_table_pl"]);
 });

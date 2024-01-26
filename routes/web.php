@@ -18,4 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get("/exportBSJP", [ExportController::class, "get_data_table_bs"]);
+Route::get("/exportBS", [ExportController::class, "get_data_table_bs"]);
+
+Route::get("/exportPL", [ExportController::class, "get_data_table_pl"]);

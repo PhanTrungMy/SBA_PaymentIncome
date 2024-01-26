@@ -5,14 +5,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom View</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 80%;
+            margin: 0 auto;
+        }
+    
+        th,
+        td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        h3{
+            text-align: center
+        }
+        h4{
+            text-align:center
+        }
+    </style>
 </head>
 
 <body>
+    <h3><strong>月次比較財務諸表(貸借対照表)</strong></h3>
+    <h4>2022年4月1日 〜 2023年3月31日</h4>
+    <h4></h4>
     <table border="3">
         <thead>
             <tr>
                 <th>勘 定 科 目</th>
-                <th>2020年度繰越</th>
+                <th>{{$year-1}}年度繰越</th>
                 <th>4 月</th>
 
                 <th>5 月</th>
@@ -33,7 +56,7 @@
             </tr>
             <tr>
                 <th>{{$data[0]["categories"][0]["category_name"]}}</th>
-                @foreach($data[0]["categories"][0]["data"] as $item)
+                @foreach($data[0]["categories"][0]["data"] as $index=> $item)
                     <th>{{$item}}</th>
                 @endforeach
             </tr>

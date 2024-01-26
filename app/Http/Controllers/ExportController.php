@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\RequestExportPL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
@@ -20,9 +21,8 @@ class ExportController extends Controller
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'pl');
 
-        $responseData = $this->fetchAndFormatData($year, $type);
-
-        return response()->json($responseData, 200);
+        $responseData = $this->fetchAndFormatDatabs($year, $type);
+        return Excel::download(new RequestExportPL($responseData, $year), 'file.xlsx');
     }
     private function fetchAndFormatData($year, $type)
     {
@@ -150,17 +150,18 @@ class ExportController extends Controller
     {
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'bs');
-        $language = $request->input("language");
 
-        if($language == "jp"){
-            $responseData = $this->fetchAndFormatDatabs($year, $type);
+        $language = $request->input("language");
+        $responseData = $this->fetchAndFormatDatabs($year, $type);
+        // return view("Custom", [
+        //     "data" => $responseData,
+        //     "year" => $year
+        // ]);
+
+        $responseData = $this->fetchAndFormatDatabs($year, $type);
 
             // return view("Custom", ["data" => $responseData]);
-            return Excel::download(new RequestExport($responseData), 'file.xlsx');
-        }
-
-        // $year = 2023;
-        // $type = "bs";
+        return Excel::download(new RequestExport($responseData, $year), "{$year}-Balance Sheet.xlsx");
 
     }
     private function fetchAndFormatDatabs($year, $type)
@@ -298,28 +299,9 @@ class ExportController extends Controller
 
     private function calculateMonthlyTotalsForCategorybs($categoryId, $year)
     {
+
         $monthlyTotals = [];
         $total = 0;
-        $startDate = Carbon::createFromDate($year, 4, 1);
-        $endDate = Carbon::createFromDate($year + 1, 3, 31);
-
-        for ($month = $startDate; $month->lte($endDate); $month->addMonth()) {
-            $monthEnd = $month->copy()->endOfMonth();
-            $balances = BalanceSheet::where('category_id', $categoryId)
-                ->where(function ($query) use ($month) {
-                    $query->where('bs_month_year', 'like', $month->format('Y-m') . '%')
-                        ->orWhere('bs_month_year', 'like', $month->format('Y') . '%');
-                })
-                ->get();
-            $monthlyAmount = 0;
-            foreach ($balances as $balance) {
-                if ($month->format('Y-m') == substr($balance->bs_month_year, 0, 7)) {
-                    $monthlyAmount += $balance->amount;
-                }
-            }
-            $monthlyTotals[$month->format('Y-m')] = $monthlyAmount;
-            $total += $monthlyAmount;
-        }
 
         $previousYear = $year - 1;
         $previousYearBalance = BalanceSheet::where('category_id', $categoryId)
@@ -328,9 +310,36 @@ class ExportController extends Controller
 
         $monthlyTotals[$previousYear] = $previousYearBalance ? $previousYearBalance->amount : null;
 
+        $startDate = Carbon::createFromDate($year, 4, 1);
+        $endDate = Carbon::createFromDate($year + 1, 3, 31);
+
+        for ($month = $startDate; $month->lte($endDate); $month->addMonth()) {
+
+            $monthEnd = $month->copy()->endOfMonth();
+
+            $balances = BalanceSheet::where('category_id', $categoryId)
+                ->where(function ($query) use ($month) {
+                    $query->where('bs_month_year', 'like', $month->format('Y-m') . '%')
+                        ->orWhere('bs_month_year', 'like', $month->format('Y') . '%');
+                })
+                ->get();
+
+            $monthlyAmount = 0;
+            foreach ($balances as $balance) {
+                if ($month->format('Y-m') == substr($balance->bs_month_year, 0, 7)) {
+                    $monthlyAmount += $balance->amount;
+                }
+            }
+
+            $monthlyTotals[$month->format('Y-m')] = $monthlyAmount;
+            $total += $monthlyAmount;
+        }
+
         $monthlyTotals['total'] = round($total, 3);
+
         return $monthlyTotals;
     }
+
 
 
     private function calculateSumbs($array1, $array2)
