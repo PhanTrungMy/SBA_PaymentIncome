@@ -293,10 +293,12 @@ class DataTableController extends Controller
     {
         $monthlyTotals = [];
         $total = 0;
+
         $startDate = Carbon::createFromDate($year, 4, 1);
         $endDate = Carbon::createFromDate($year + 1, 3, 31);
 
         for ($month = $startDate; $month->lte($endDate); $month->addMonth()) {
+
             $monthEnd = $month->copy()->endOfMonth();
             $balances = BalanceSheet::where('category_id', $categoryId)
                 ->where(function ($query) use ($month) {
@@ -304,14 +306,16 @@ class DataTableController extends Controller
                         ->orWhere('bs_month_year', 'like', $month->format('Y') . '%');
                 })
                 ->get();
+
             $monthlyAmount = 0;
             foreach ($balances as $balance) {
                 if ($month->format('Y-m') == substr($balance->bs_month_year, 0, 7)) {
                     $monthlyAmount += $balance->amount;
+                    $total += $monthlyAmount;
                 }
             }
+
             $monthlyTotals[$month->format('Y-m')] = $monthlyAmount;
-            $total += $monthlyAmount;
         }
 
         $previousYear = $year - 1;
@@ -323,8 +327,10 @@ class DataTableController extends Controller
         $monthlyTotals[$previousYear] = $previousYearBalance ? $previousYearBalance->amount : null;
 
         $monthlyTotals['total'] = round($total, 3);
+
         return $monthlyTotals;
     }
+
 
 
     private function calculateSumbs($array1, $array2)
