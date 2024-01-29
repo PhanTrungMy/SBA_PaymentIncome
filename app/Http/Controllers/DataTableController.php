@@ -317,6 +317,7 @@ class DataTableController extends Controller
         $previousYear = $year - 1;
         $previousYearBalance = BalanceSheet::where('category_id', $categoryId)
             ->where('bs_month_year', 'like', $previousYear . '%')
+            ->whereRaw('LENGTH(balance_sheets.bs_month_year) = 4')
             ->first();
 
         $monthlyTotals[$previousYear] = $previousYearBalance ? $previousYearBalance->amount : null;
