@@ -163,7 +163,6 @@ class ExportController extends Controller
         //     "year" => $year
         // ]);
 
-        $responseData = $this->fetchAndFormatDatabs($year, $type);
 
             // return view("Custom", ["data" => $responseData]);
         return Excel::download(new RequestExport($responseData, $year), "{$year}-Balance Sheet.xlsx");
@@ -344,6 +343,8 @@ class ExportController extends Controller
 
         return $monthlyTotals;
     }
+
+
 
 
 
