@@ -21,8 +21,13 @@ class ExportController extends Controller
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'pl');
 
-        $responseData = $this->fetchAndFormatDatabs($year, $type);
-        return Excel::download(new RequestExportPL($responseData, $year), 'file.xlsx');
+        $responseData = $this->fetchAndFormatData($year, $type);
+
+        // return view("CustomPL", [
+        //     "data" => $responseData,
+        //     "year" => $year,
+        // ]);
+        return Excel::download(new RequestExportPL($responseData, $year), "{$year}-Profit and Loss Report.xlsx"); 
     }
     private function fetchAndFormatData($year, $type)
     {
@@ -146,12 +151,12 @@ class ExportController extends Controller
 
 
 
+
     public function get_data_table_bs(Request $request)
     {
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'bs');
 
-        $language = $request->input("language");
         $responseData = $this->fetchAndFormatDatabs($year, $type);
         // return view("Custom", [
         //     "data" => $responseData,

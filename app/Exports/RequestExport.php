@@ -36,13 +36,15 @@ class RequestExport implements FromView, WithEvents
             AfterSheet::class => function (AfterSheet $event) {
 
                 $cellRange = 'A4:A37';
-                $event->sheet->getDelegate()->getColumnDimension("A")->setWidth(30);
+                $event->sheet->getDelegate()->getColumnDimension("A")->setWidth(33);
                 for ($i=4; $i < 38; $i++) {
                     $event->sheet->getDelegate()->getRowDimension("{$i}")->setRowHeight(20);
                 }
                 $event->sheet->getDelegate()->getRowDimension("2")->setRowHeight(20);
 
-                $event->sheet->getDelegate()->getColumnDimension("B")->setWidth(15);
+                $event->sheet->getDelegate()->getColumnDimension("B")->setWidth(18);
+
+                $event->sheet->getDelegate()->getColumnDimension("O")->setWidth(15);
 
                 $event->sheet->getDelegate()->getStyle($cellRange)->getBorders()->getAllBorders()->setBorderStyle("medium");
 
@@ -78,13 +80,20 @@ class RequestExport implements FromView, WithEvents
 
                 $event->sheet->getDelegate()->getStyle("B4")->getFont()->setBold(True);
 
-                $event->sheet->getDelegate()->getStyle("O4")->getFont()->setBold(True);
+                $event->sheet->getDelegate()->getStyle("A4")->getFont()->setBold(True);
+
+                $event->sheet->getDelegate()->getStyle("A4:O4")->getFont()->setBold(True);
 
                 $event->sheet->getDelegate()->getStyle("A1:O1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
-                $event->sheet->getDelegate()->mergeCells("A1:N1");
+                $event->sheet->getDelegate()->mergeCells("A1:O1");
 
-                $event->sheet->getDelegate()->mergeCells("A2:N2");
+                $event->sheet->getDelegate()->mergeCells("A2:O2");
+
+                $event->sheet->getDelegate()->getStyle("A1:O1")->getFont()->setSize(20)->setName('MS Mincho');
+                $event->sheet->getDelegate()->getStyle("A2:O2")->getFont()->setSize(15)->setName('MS Mincho');
+                $event->sheet->getDelegate()->getStyle("A4:A37")->getFont()->setSize(12)->setName('MS Mincho');
+                $event->sheet->getDelegate()->getStyle("A4:O4")->getFont()->setSize(12)->setName('MS Mincho');
 
                 $event->sheet->getDelegate()->getStyle("A2:N2")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
