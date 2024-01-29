@@ -142,8 +142,6 @@ class DataTableController extends Controller
         return $result;
     }
 
-
-
     public function get_data_table_bs(Request $request)
     {
         $year = $request->input('y', date('Y'));
@@ -184,8 +182,9 @@ class DataTableController extends Controller
                     }
                 }
             }
-
-            $totalMonth['total'] = round(array_sum($totalMonth), 3);
+            $totalMonthCopy = $totalMonth;
+            unset($totalMonthCopy[$year - 1]);
+            $totalMonth['total'] = round(array_sum($totalMonthCopy), 3);
             $groupData['total_month'] = $totalMonth;
             $totalMonths[$group->id] = $totalMonth;
             array_push($data, $groupData);
@@ -287,8 +286,6 @@ class DataTableController extends Controller
 
         return $months;
     }
-
-
     private function calculateMonthlyTotalsForCategorybs($categoryId, $year)
     {
         $monthlyTotals = [];
@@ -330,9 +327,6 @@ class DataTableController extends Controller
 
         return $monthlyTotals;
     }
-
-
-
     private function calculateSumbs($array1, $array2)
     {
         $result = [];
@@ -349,6 +343,7 @@ class DataTableController extends Controller
         }
         return $result;
     }
+
     public function getAmounts_byyear(Request $request)
     {
         $year = $request->input('y') - 1;
@@ -372,6 +367,7 @@ class DataTableController extends Controller
         });
         return response()->json($response, 200);
     }
+
     public function updateOrCreateBalanceSheet(Request $request)
     {
         $balanceSheetsData = $request->all();
