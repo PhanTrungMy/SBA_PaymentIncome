@@ -24,23 +24,29 @@ class PaymentController extends Controller
             $perPage = in_array($perPage, [10, 20]) ? $perPage : 10;
             $month = $request["month"];
             $year = $request["year"];
-            $query = Payment::with('Category')
-                ->whereNull('deleted_at')->orderBy($key, $direction);
+
+            $query = DB::table('payments')
+                ->join('categories', 'payments.category_id', '=', 'categories.id')
+                ->join('exchange_rates', 'payments.exchange_rate_id', '=', 'exchange_rates.id')
+                ->select('payments.*', 'exchange_rates.usd as usd',   'exchange_rates.jpy as jpy',  'categories.name as category_name')
+                ->whereNull('payments.deleted_at')
+                ->orderBy($key, $direction);
+
             if ($month && $year) {
                 $query->whereMonth('payment_date', $month)
                     ->whereYear('payment_date', $year);
             }
             $totalCost = $query->sum('cost');
             $totalUSD = $query->get()->reduce(function ($carry, $payment) {
-                return $carry + $payment->cost / $payment->exchange_rate->usd;
+                return $carry + $payment->cost / $payment->usd;
             }, 0);
             $totalJPY = $query->get()->reduce(function ($carry, $payment) {
-                return $carry + $payment->cost / $payment->exchange_rate->jpy;
+                return $carry + $payment->cost / $payment->jpy;
             }, 0);
             $payments = $query->paginate($perPage);
             foreach ($payments as $payment) {
-                $jpy = $payment->cost / $payment->exchange_rate->jpy;
-                $usd = $payment->cost / $payment->exchange_rate->usd;
+                $jpy = $payment->cost / $payment->jpy;
+                $usd = $payment->cost / $payment->usd;
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
@@ -56,9 +62,11 @@ class PaymentController extends Controller
                     'payment_date' => $payment->payment_date,
                     'created_at' => $payment->created_at,
                     'category' =>  [
-                        'id' => $payment->category->id,
-                        'name' => $payment->category->name,
-                        'payment_count' => $payment->category->payment_count,
+                        // 'id' => '0',
+                        'id' => $payment->category_id,
+                        'name' => $payment->category_name,
+                        'payment_count' => '0',
+                        // 'payment_count' => $payment->category->payment_count,
                     ],
 
                 ];
