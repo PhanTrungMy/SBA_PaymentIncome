@@ -13,6 +13,8 @@ class PaymentController extends Controller
 {
     public function get_all_payments(Request $request)
     {
+        $direction = $request->query('direction') ?? "desc";
+        $key = $request->query('key') ?? "created_at";
         try {
             $totalUSD = 0;
             $totalCost = 0;
@@ -23,8 +25,7 @@ class PaymentController extends Controller
             $month = $request["month"];
             $year = $request["year"];
             $query = Payment::with('Category')
-                ->whereNull('deleted_at')->orderBy('created_at', 'desc');
-
+                ->whereNull('deleted_at')->orderBy($key, $direction);
             if ($month && $year) {
                 $query->whereMonth('payment_date', $month)
                     ->whereYear('payment_date', $year);
