@@ -38,10 +38,11 @@ class OrderController extends Controller
                 $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
 
-            $exchange_rate_id = $request["exchange_rate_id"];
-            $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
+            // $exchange_rate_id = $request["exchange_rate_id"];
 
             foreach($data_1->items() as $key => $item){
+
+                $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $item["exchange_rate_id"])->orderBy("id", "desc")->get();
                 $jpy = $item["vnd"] / ($check_exchange_rate_id->first()->jpy);
                 $usd = $item["vnd"] / ($check_exchange_rate_id->first()->usd);
                 $data_1[$key]['jpy'] = $jpy;
@@ -84,10 +85,12 @@ class OrderController extends Controller
         try {
             $OrderByID = DB::table("orders")->where("id", $id)->get();
 
-            $exchange_rate_id = $request["exchange_rate_id"];
-            $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
+            // $exchange_rate_id = $request["exchange_rate_id"];
+            // $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
 
             foreach ($OrderByID as $key => $item) {
+
+                $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $item->exchange_rate_id)->orderBy("id", "desc")->get();
                 $jpy = $item->vnd / ($check_exchange_rate_id->first()->jpy);
                 $usd = $item->vnd / ($check_exchange_rate_id->first()->usd);
                 $OrderByID[$key]->jpy = $jpy;
