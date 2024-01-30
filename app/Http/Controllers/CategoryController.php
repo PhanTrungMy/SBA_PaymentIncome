@@ -22,7 +22,9 @@ class CategoryController extends Controller
 
         $query = Category::with('group')
             ->join('groups', 'categories.group_id', '=', 'groups.id')
-            ->select('categories.*', 'groups.report_type', 'groups.name as group_name');
+            ->select('categories.*', 'groups.report_type', 'groups.name as group_name')
+            ->orderBy('categories.group_id', 'asc')
+            ->orderBy('categories.id', 'asc');
 
         if (!empty($name)) {
             $query->where('categories.name', 'LIKE', "%{$name}%");
