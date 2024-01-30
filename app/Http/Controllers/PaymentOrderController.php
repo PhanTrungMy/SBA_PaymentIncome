@@ -26,13 +26,15 @@ class PaymentOrderController extends Controller
             }         
           $payment_order = $query->paginate($perPage);
             foreach ($payment_order as $payment) {
+                $jpy = $payment->vnd / $payment->exchange_rate->jpy;
+                $usd = $payment->vnd / $payment->exchange_rate->usd;
                 $resultPayments[] = [
                     "id" => $payment->id,
                     'user_id' => $payment->user_id,
                     'company_name' => $payment->company_name,
-                    'jpy' => $payment->jpy,
+                    'jpy' => $jpy,
                     'vnd' => $payment->vnd,
-                    'usd' =>$payment->usd,
+                    'usd' =>$usd,
                     'exchange_rate_id' => $payment->exchange_rate_id,
                     'payment_date' => $payment->payment_date,
                     'created_at' => $payment->created_at,
@@ -114,16 +116,11 @@ class PaymentOrderController extends Controller
                     ], 400);
                 }
             }
-            $exchangeRate = ExchangeRate::find($request->exchange_rate_id);
-            $usd = $request->vnd / $exchangeRate->usd;
-            $jpy = $request->vnd / $exchangeRate->jpy;
             $payment_order = PaymentOrder::create(
                 [
                     'user_id' => $request->user_id,
                     'company_name' => $request->company_name,
-                    'jpy' => $jpy,
                     'vnd' => $request->vnd,
-                    'usd' => $usd,
                     'exchange_rate_id' => $request->exchange_rate_id,
                     'payment_date' => $request->payment_date,
                     'created_at' => $request->created_at,
@@ -174,11 +171,6 @@ class PaymentOrderController extends Controller
         $new_payment_order = request()->all();
         $payment_order_id = request()->route('id');
         $payment_order = PaymentOrder::findOrFail($payment_order_id);
-        $exchangeRate = ExchangeRate::find($payment_order->exchange_rate_id);
-        $usd = $payment_order->vnd / $exchangeRate->usd;
-        $jpy = $payment_order->vnd / $exchangeRate->jpy;
-        $payment_order->usd = $usd;
-        $payment_order->jpy = $jpy;
         $payment_order->save();
 
         if ($payment_order) {
