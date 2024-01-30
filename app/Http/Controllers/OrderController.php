@@ -26,17 +26,28 @@ class OrderController extends Controller
             $currentPage = request()->query('page', $Page);
 
             if ($month != null && $year != null) {
-                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($month == null && $year != null) {
-                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($month != null && $year == null) {
-                $data_1 = Order::whereNull('deleted_at')->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($month == null && $year == null) {
-                $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
+
+            $exchange_rate_id = $request["exchange_rate_id"];
+            $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
+
+            foreach($data_1->items() as $key => $item){
+                $jpy = $item["vnd"] / ($check_exchange_rate_id->first()->jpy);
+                $usd = $item["vnd"] / ($check_exchange_rate_id->first()->usd);
+                $data_1[$key]['jpy'] = $jpy;
+                $data_1[$key]['usd'] = $usd;
+            }
+
             
             if ($data_1->count() > 0) {
                 return response()->json([
@@ -71,7 +82,18 @@ class OrderController extends Controller
     function Get_Order_By_ID(Request $request, $id)
     {
         try {
-            $OrderByID = DB::table("orders")->where("id", $id)->first();
+            $OrderByID = DB::table("orders")->where("id", $id)->get();
+
+            $exchange_rate_id = $request["exchange_rate_id"];
+            $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
+
+            foreach ($OrderByID as $key => $item) {
+                $jpy = $item->vnd / ($check_exchange_rate_id->first()->jpy);
+                $usd = $item->vnd / ($check_exchange_rate_id->first()->usd);
+                $OrderByID[$key]->jpy = $jpy;
+                $OrderByID[$key]->usd = $usd;
+            }
+
             if ($OrderByID != null) {
                 return response()->json([
                     "success" => true,
@@ -118,8 +140,8 @@ class OrderController extends Controller
 
         $check_user_id = DB::table("users")->where("id", $user_id)->get();
         $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->orderBy("id", "desc")->get();
-        $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
-        $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
+        // $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
+        // $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
 
         if ($check_user_id != null) {
             if ($check_exchange_rate_id != null) {
@@ -144,8 +166,8 @@ class OrderController extends Controller
                         "vnd" => $request["vnd"],
                         "order_date" => $originalDate,
                         "exchange_rate_id" => $request["exchange_rate_id"],
-                        "jpy" => $jpn,
-                        "usd" => $usd,
+                        // "jpy" => $jpn,
+                        // "usd" => $usd,
                         "created_at" => now(),
                         "updated_at" => now()
                     ]);
@@ -183,8 +205,8 @@ class OrderController extends Controller
         ]);
         $check_user_id = DB::table("users")->where("id", $user_id)->get();
         $check_exchange_rate_id = DB::table("exchange_rates")->where("id", $exchange_rate_id)->get();
-        $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
-        $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
+        // $jpn = $request["vnd"] / ($check_exchange_rate_id->first()->jpy);
+        // $usd = $request["vnd"] / ($check_exchange_rate_id->first()->usd);
 
         if ($check_user_id != null) {
             if ($check_exchange_rate_id != null) {
@@ -217,8 +239,8 @@ class OrderController extends Controller
                         "vnd" => $request["vnd"],
                         "order_date" => $originalDate,
                         "exchange_rate_id" => $request["exchange_rate_id"],
-                        "jpy" => $jpn,
-                        "usd" => $usd,
+                        // "jpy" => $jpn,
+                        // "usd" => $usd,
                         "updated_at" => now()
                     ]);
                     $get_update = DB::table("orders")->where("id", $id)->first();
