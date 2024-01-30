@@ -35,223 +35,69 @@ class RequestExport implements FromView, WithEvents
         return [
             AfterSheet::class => function (AfterSheet $event) {
 
-                $cellRange = 'A4:A37';
-                $event->sheet->getDelegate()->getColumnDimension("A")->setWidth(30);
-                for ($i=4; $i < 38; $i++) {
-                    $event->sheet->getDelegate()->getRowDimension("{$i}")->setRowHeight(20);
+                $number = 5;
+                for ($i = 0; $i < count($this->data); $i++) {
+                    for ($j = 0; $j < count($this->data[$i]["categories"]); $j++) {
+                        if ($this->data[$i]["categories"][$j] !== null) {
+                            $number += 1;
+                        } else {
+                            $number += 1;
+                        }
+                    }
+                    $number += 1;
+                    $Number = $number - 1;
+
+                    $event->sheet->getDelegate()->getStyle("A{$Number}:O{$Number}")->applyFromArray([
+                        'fill' => [
+                            'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                            'startColor' => [
+                                    'argb' => 'DDDDDD',
+                                ],
+                        ],
+                    ]);
+
+                    $event->sheet->getDelegate()->getStyle("A4:A{$Number}")->getFont()->setBold(True);
+                    $event->sheet->getDelegate()->getStyle("A4:A{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("B4:B{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("C4:C{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("D4:D{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("E4:E{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("F4:F{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("G4:G{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("H4:H{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("I4:I{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("J4:J{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("K4:K{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("L4:L{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("M4:M{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("N4:N{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("O4:O{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
+                    $event->sheet->getDelegate()->getStyle("A4:A{$Number}")->getFont()->setSize(12)->setName('MS Mincho');
+                    $event->sheet->getDelegate()->getRowDimension("{$Number}")->setRowHeight(20);
                 }
-                $event->sheet->getDelegate()->getRowDimension("2")->setRowHeight(20);
-
-                $event->sheet->getDelegate()->getColumnDimension("B")->setWidth(15);
-
-                $event->sheet->getDelegate()->getColumnDimension("O")->setWidth(15);
-
-                $event->sheet->getDelegate()->getStyle($cellRange)->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("B4:B37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("C4:C37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("D4:D37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("E4:E37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("F4:F37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("G4:G37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("H4:H37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("I4:I37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("J4:J37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("K4:K37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("L4:L37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("M4:M37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("N4:N37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle("O4:O37")->getBorders()->getAllBorders()->setBorderStyle("medium");
-
-                $event->sheet->getDelegate()->getStyle($cellRange)->getFont()->setBold(True);
-
-                $event->sheet->getDelegate()->getStyle("B4")->getFont()->setBold(True);
-
-                $event->sheet->getDelegate()->getStyle("O4")->getFont()->setBold(True);
-
-                $event->sheet->getDelegate()->getStyle("A1:O1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
-
-                $event->sheet->getDelegate()->mergeCells("A1:N1");
-
-                $event->sheet->getDelegate()->mergeCells("A2:N2");
-
-                $event->sheet->getDelegate()->getStyle("A2:N2")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
 
                 $event->sheet->getDelegate()->getStyle('A4:O4')->applyFromArray([
                     'fill' => [
                         'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
                         'startColor' => [
-                            'argb' => 'ADD8E6',
-                        ],
+                                'argb' => 'ADD8E6',
+                            ],
                     ],
                 ]);
 
-                $event->sheet->getDelegate()->getStyle('A8:O8')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A10:O10')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A11:O11')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A13:O13')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A14:O14')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A18:O18')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
+                $event->sheet->getDelegate()->getStyle("A4:O4")->getFont()->setBold(True);
+                $event->sheet->getDelegate()->mergeCells("A1:O1");
 
-                $event->sheet->getDelegate()->getStyle('A19:O19')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A20:O20')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A25:O25')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A26:O26')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A27:O27')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A29:O29')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A31:O31')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A32:O32')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A33:O33')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A34:O34')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A35:O35')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A36:O36')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
-                $event->sheet->getDelegate()->getStyle('A37:O37')->applyFromArray([
-                    'fill' => [
-                        'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                        'startColor' => [
-                            'argb' => 'DDDDDD',
-                        ],
-                    ],
-                ]);
+                $event->sheet->getDelegate()->mergeCells("A2:O2");
+                $event->sheet->getDelegate()->getStyle("A1:O1")->getFont()->setSize(20)->setName('MS Mincho');
+                $event->sheet->getDelegate()->getStyle("A2:O2")->getFont()->setSize(15)->setName('MS Mincho');
+                $event->sheet->getDelegate()->getStyle("A4:O4")->getFont()->setSize(12)->setName('MS Mincho');
+
+                $event->sheet->getDelegate()->getStyle("A1:O1")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $event->sheet->getDelegate()->getStyle("A2:O2")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+                $event->sheet->getDelegate()->getColumnDimension("A")->setWidth(35);
+                $event->sheet->getDelegate()->getColumnDimension("O")->setWidth(15);
+                $event->sheet->getDelegate()->getColumnDimension("B")->setWidth(20);
             },
         ];
     }

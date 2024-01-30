@@ -30,43 +30,29 @@
         </thead>
         <thead>
                     @for($i = 0; $i < count($data); $i++)
-                        @for($j = 0; $j < count($data[$i]["categories"]); $j++)
-                            @if(isset($data[$i]["categories"][$j]["category_name"]))
+                        @if(count($data[$i]["categories"])> 0)
+                            @foreach($data[$i]["categories"] as $category)
                                 <tr>
-                                    <th>{{$data[$i]["categories"][$j]["category_name"]}}</th>
-                                    @foreach($data[$i]["categories"][$j]["data"] as $item)
-                                        <th>{{$item}}</th>
+                                    <th>{{ $category['category_name'] }}</th>
+                                    @foreach($category["data"] as $item)
+                                        <th>{{ $item }}</th>
                                     @endforeach
                                 </tr>
-                                @if(count($data[$i]["categories"]) == 0)
-                                <tr>
-                                    <th>{{$data[$i]["group_name"]}}</th>
-                                    @foreach($data[$i]["total_month"] as $itemData)
-                                        <th>{{$itemData}}</th>
-                                    @endforeach
-                                </tr>
-                                @endif
-                                @if($j == count($data[$i]["categories"])-1)
-                                    @if($data[$i]["group_name"] == " ")
-                                        @continue
-                                    @else
-                                        <tr>
-                                            <th>{{$data[$i]["group_name"]}}</th>
-                                            @foreach($data[$i]["total_month"] as $itemData)
-                                                <th>{{$itemData}}</th>
-                                            @endforeach
-                                        </tr>
-                                    @endif
-                                @endif
-                            @else
+                            @endforeach
+                        <tr>
+                            <th>{{$data[$i]["group_name"]}}</th>
+                            @foreach($data[$i]["total_month"] as $itemData)
+                                <th>{{$itemData}}</th>
+                            @endforeach
+                        </tr>
+                        @else
                             <tr>
                                 <th>{{$data[$i]["group_name"]}}</th>
                                 @foreach($data[$i]["total_month"] as $itemData)
                                     <th>{{$itemData}}</th>
                                 @endforeach
                             </tr>
-                            @endif
-                        @endfor
+                        @endif
                     @endfor
         </thead>
     </table>

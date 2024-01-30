@@ -29,7 +29,7 @@
 
 <body>
     <h3><strong>月次比較財務諸表(貸借対照表)</strong></h3>
-    <h4>2022年4月1日 〜 2023年3月31日</h4>
+    <h4>{{$year-1}}年4月1日 〜 {{$year}}年3月31日</h4>
     <h4></h4>
     <table border="3">
         <thead>
@@ -54,235 +54,48 @@
                 <th>3 月</th>
                 <th>当期累計</th>
             </tr>
-            <tr>
-                <th>{{$data[0]["categories"][0]["category_name"]}}</th>
-                @foreach($data[0]["categories"][0]["data"] as $index=> $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-            <tr>
-                <th>{{$data[0]["categories"][1]["category_name"]}}</th>
-                @foreach($data[0]["categories"][1]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-            <tr>
-                <th>{{$data[0]["categories"][2]["category_name"]}}</th>
-                @foreach($data[0]["categories"][2]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
+            <thead>
+                    @for($i = 0; $i < count($data); $i++)
+                        @for($j = 0; $j < count($data[$i]["categories"]); $j ++)
+                            <tr>
+                                <th>{{$data[$i]["categories"][$j]["category_name"]}}</th>
+                                <th>{{$data[$i]["categories"][$j]["data"][$year-1]}}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-04"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-05"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-06"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-07"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-08"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-09"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-10"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-11"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-12"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year+1) . "-01"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year+1) . "-02"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"][($year+1) . "-03"] }}</th>
+                                <th>{{ $data[$i]["categories"][$j]["data"]["total"] }}</th>
 
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[0]["group_name"]}}</th>
-                @foreach($data[0]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[1]["categories"][0]["category_name"]}}</th>
-                @foreach($data[1]["categories"][0]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[1]["group_name"]}}</th>
-                @foreach($data[1]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[2]["group_name"]}}</th>
-                @foreach($data[2]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[3]["categories"][0]["category_name"]}}</th>
-                @foreach($data[3]["categories"][0]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[3]["group_name"]}}</th>
-                @foreach($data[3]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[4]["group_name"]}}</th>
-                @foreach($data[4]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[5]["categories"][0]["category_name"]}}</th>
-                @foreach($data[5]["categories"][0]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[5]["categories"][1]["category_name"]}}</th>
-                @foreach($data[5]["categories"][1]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[5]["categories"][2]["category_name"]}}</th>
-                @foreach($data[5]["categories"][2]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[5]["group_name"]}}</th>
-                @foreach($data[5]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[6]["group_name"]}}</th>
-                @foreach($data[6]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[7]["group_name"]}}</th>
-                @foreach($data[7]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[8]["categories"][0]["category_name"]}}</th>
-                @foreach($data[8]["categories"][0]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[8]["categories"][1]["category_name"]}}</th>
-                @foreach($data[8]["categories"][1]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[8]["categories"][2]["category_name"]}}</th>
-                @foreach($data[8]["categories"][2]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[8]["categories"][3]["category_name"]}}</th>
-                @foreach($data[8]["categories"][3]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[8]["group_name"]}}</th>
-                @foreach($data[8]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[9]["group_name"]}}</th>
-                @foreach($data[9]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[10]["group_name"]}}</th>
-                @foreach($data[10]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr>
-                <th>{{$data[11]["categories"][0]["category_name"]}}</th>
-                @foreach($data[11]["categories"][0]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[11]["group_name"]}}</th>
-                @foreach($data[11]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-            
-            <tr>
-                <th>{{$data[12]["categories"][0]["category_name"]}}</th>
-                @foreach($data[12]["categories"][0]["data"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[12]["group_name"]}}</th>
-                @foreach($data[12]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[13]["group_name"]}}</th>
-                @foreach($data[13]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[14]["group_name"]}}</th>
-                @foreach($data[14]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[15]["group_name"]}}</th>
-                @foreach($data[15]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[16]["group_name"]}}</th>
-                @foreach($data[16]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[17]["group_name"]}}</th>
-                @foreach($data[17]["total_month"] as $item)
-                <th>{{$item}}</th>
-                @endforeach
-            </tr>
-
-            <tr style="background-color: #a199b1;">
-                <th>{{$data[18]["group_name"]}}</th>
-                @foreach($data[18]["total_month"] as $item)
-                    <th>{{$item}}</th>
-                @endforeach
-            </tr>
-        </thead>
-    </table>
+                            </tr>
+                        @endfor
+                        <tr>
+                            <th>{{$data[$i]["group_name"]}}</th>
+                            <th>{{$data[$i]["total_month"][$year-1]}}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-04"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-05"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-06"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-07"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-08"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-09"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-10"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-11"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year) . "-12"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year+1) . "-01"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year+1) . "-02"] }}</th>
+                            <th>{{ $data[$i]["total_month"][($year+1) . "-03"] }}</th>
+                            <th>{{ $data[$i]["total_month"]["total"] }}</th>
+                        </tr>
+                    @endfor
+            </thead>
+        </table>
 </body>
 
 </html>
