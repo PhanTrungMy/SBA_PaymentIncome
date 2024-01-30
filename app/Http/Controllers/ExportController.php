@@ -21,14 +21,13 @@ class ExportController extends Controller
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'pl');
 
-
         $responseData = $this->fetchAndFormatData($year, $type);
 
         // return view("CustomPL", [
         //     "data" => $responseData,
         //     "year" => $year,
         // ]);
-         return Excel::download(new RequestExportPL($responseData, $year), "{$year}-Profit and Loss Report.xlsx"); 
+        return Excel::download(new RequestExportPL($responseData, $year), "{$year}-Profit and Loss Report.xlsx");
     }
     private function fetchAndFormatData($year, $type)
     {
@@ -150,26 +149,20 @@ class ExportController extends Controller
         return $result;
     }
 
-
-
-
     public function get_data_table_bs(Request $request)
     {
-        // $year = $request->input('y', date('Y'));
+        $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'bs');
 
-        $year = 2023;
-
         $responseData = $this->fetchAndFormatDatabs($year, $type);
-        return view("Custom", [
-            "data" => $responseData,
-            "year" => $year
-        ]);
+        // return view("Custom", [
+        //     "data" => $responseData,
+        //     "year" => $year
+        // ]);
 
 
-            // return view("Custom", ["data" => $responseData]);
-        // return Excel::download(new RequestExport($responseData, $year), "{$year}-Balance Sheet.xlsx");
-
+        // return view("Custom", ["data" => $responseData]);
+        return Excel::download(new RequestExport($responseData, $year), "{$year}-Balance Sheet.xlsx");
     }
     private function fetchAndFormatDatabs($year, $type)
     {
@@ -202,8 +195,9 @@ class ExportController extends Controller
                     }
                 }
             }
-
-            $totalMonth['total'] = round(array_sum($totalMonth), 3);
+            $totalMonthCopy = $totalMonth;
+            unset($totalMonthCopy[$year - 1]);
+            $totalMonth['total'] = round(array_sum($totalMonthCopy), 3);
             $groupData['total_month'] = $totalMonth;
             $totalMonths[$group->id] = $totalMonth;
             array_push($data, $groupData);
@@ -245,9 +239,12 @@ class ExportController extends Controller
                         $totalMonths[21] = $totalMonths[20];
                     }
                 case 23:
-                    if (isset($totalMonths[18]) && isset($totalMonths[21])) {
-                        $groupData['total_month'] = $this->calculateDifferencebs($totalMonths[12], $totalMonths[11]);
-                        $totalMonths[23] = $this->calculateDifferencebs($totalMonths[12], $totalMonths[11]);
+                    if (isset($totalMonths[18]) && isset($totalMonths[21]) && isset($totalMonths[22])) {
+                        $groupData['total_month'] = $this->calculateDifference($totalMonths[18], $totalMonths[21]);
+                        $groupData['total_month'] = $this->calculateDifference($groupData['total_month'], $totalMonths[22]);
+
+                        $totalMonths[23] = $this->calculateDifference($totalMonths[18], $totalMonths[21]);
+                        $totalMonths[23] = $this->calculateDifference($totalMonths[23], $totalMonths[22]);
                     }
                     break;
                 case 25:
@@ -302,16 +299,16 @@ class ExportController extends Controller
 
         return $months;
     }
-
-
     private function calculateMonthlyTotalsForCategorybs($categoryId, $year)
     {
         $monthlyTotals = [];
         $total = 0;
+
         $startDate = Carbon::createFromDate($year, 4, 1);
         $endDate = Carbon::createFromDate($year + 1, 3, 31);
 
         for ($month = $startDate; $month->lte($endDate); $month->addMonth()) {
+
             $monthEnd = $month->copy()->endOfMonth();
             $balances = BalanceSheet::where('category_id', $categoryId)
                 ->where(function ($query) use ($month) {
@@ -319,30 +316,30 @@ class ExportController extends Controller
                         ->orWhere('bs_month_year', 'like', $month->format('Y') . '%');
                 })
                 ->get();
+
             $monthlyAmount = 0;
             foreach ($balances as $balance) {
                 if ($month->format('Y-m') == substr($balance->bs_month_year, 0, 7)) {
                     $monthlyAmount += $balance->amount;
+                    $total += $monthlyAmount;
                 }
             }
+
             $monthlyTotals[$month->format('Y-m')] = $monthlyAmount;
-            $total += $monthlyAmount;
         }
 
         $previousYear = $year - 1;
         $previousYearBalance = BalanceSheet::where('category_id', $categoryId)
             ->where('bs_month_year', 'like', $previousYear . '%')
+            ->whereRaw('LENGTH(balance_sheets.bs_month_year) = 4')
             ->first();
 
         $monthlyTotals[$previousYear] = $previousYearBalance ? $previousYearBalance->amount : null;
 
         $monthlyTotals['total'] = round($total, 3);
+
         return $monthlyTotals;
     }
-
-
-
-
     private function calculateSumbs($array1, $array2)
     {
         $result = [];
@@ -359,6 +356,7 @@ class ExportController extends Controller
         }
         return $result;
     }
+
     public function getAmounts_byyear(Request $request)
     {
         $year = $request->input('y') - 1;
@@ -382,6 +380,7 @@ class ExportController extends Controller
         });
         return response()->json($response, 200);
     }
+
     public function updateOrCreateBalanceSheet(Request $request)
     {
         $balanceSheetsData = $request->all();
