@@ -15,21 +15,22 @@ class OutsourcingController extends Controller
         try {
             $perPage = $request->query('per_page', 5);
             $page = $request->query('page', 1);
-
             $outsourcing = Outsourcing::whereNull('deleted_at')->orderBy('created_at', 'desc');
-
             if ($request->has('month')) {
                 $month = $request->query('month');
                 $outsourcing = $outsourcing->whereMonth('outsourced_date', $month);
             }
-
             if ($request->has('year')) {
                 $year = $request->query('year');
                 $outsourcing = $outsourcing->whereYear('outsourced_date', $year);
             }
-
             $outsourcing = $outsourcing->paginate($perPage, ['*'], 'page', $page);
-
+            $outsourcingItems = $outsourcing->items();
+            foreach ($outsourcingItems as $item) {
+                $exchangeRate = ExchangeRate::find($item->exchange_rate_id);
+                $item->jpy = $item->vnd / $exchangeRate->jpy;
+                $item->usd = $item->vnd / $exchangeRate->usd;
+            }
             return response()->json([
                 'success' => true,
                 'message' => 'Get all outsourcing successfully',
@@ -39,7 +40,7 @@ class OutsourcingController extends Controller
                     'current_page' => $outsourcing->currentPage(),
                     'total_pages' => $outsourcing->lastPage()
                 ],
-                'outsourcing' => $outsourcing->items()
+                'outsourcing' => $outsourcingItems
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -52,14 +53,15 @@ class OutsourcingController extends Controller
     {
         try {
             $outsourcing = Outsourcing::find($id);
-
             if (!$outsourcing) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Outsourcing not found'
                 ], 404);
             }
-
+            $exchangeRate = ExchangeRate::find($outsourcing->exchange_rate_id);
+            $outsourcing->jpy = $outsourcing->vnd / $exchangeRate->jpy;
+            $outsourcing->usd = $outsourcing->vnd / $exchangeRate->usd;
             return response()->json([
                 'success' => true,
                 'message' => 'Get outsourcing successfully',
@@ -94,23 +96,8 @@ class OutsourcingController extends Controller
                 ], 400);
             }
 
-            $exchangeRate = ExchangeRate::find($request->input('exchange_rate_id'));
-            if (!$exchangeRate) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Exchange rate not found'
-                ], 404);
-            }
-
-            $vndAmount = $request->input('vnd');
-            $jpyValue = $vndAmount / $exchangeRate->jpy;
-            $usdValue = $vndAmount / $exchangeRate->usd;
-
-
             $outsourcing = new Outsourcing();
             $outsourcing->fill($request->all());
-            $outsourcing->jpy = $jpyValue;
-            $outsourcing->usd = $usdValue;
             $outsourcing->save();
 
             return response()->json([
@@ -148,18 +135,6 @@ class OutsourcingController extends Controller
                 ], 400);
             }
 
-            $exchangeRate = ExchangeRate::find($request->input('exchange_rate_id'));
-            if (!$exchangeRate) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Exchange rate not found'
-                ], 404);
-            }
-
-            $vndAmount = $request->input('vnd');
-            $jpyValue = $vndAmount / $exchangeRate->jpy;
-            $usdValue = $vndAmount / $exchangeRate->usd;
-
             $outsourcing = Outsourcing::find($id);
             if (!$outsourcing) {
                 return response()->json([
@@ -167,9 +142,8 @@ class OutsourcingController extends Controller
                     'message' => 'Outsourcing not found'
                 ], 404);
             }
+
             $outsourcing->fill($request->all());
-            $outsourcing->jpy = $jpyValue;
-            $outsourcing->usd = $usdValue;
             $outsourcing->save();
 
             return response()->json([
