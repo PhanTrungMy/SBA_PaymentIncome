@@ -209,6 +209,7 @@ class DataTableController extends Controller
                         $groupData['total_month'] = $totalMonths[16];
                         $totalMonths[17] = $totalMonths[16];
                     }
+                    break;
                 case 18:
                     if (isset($totalMonths[17]) and isset($totalMonths[15])) {
                         $groupData['total_month'] = $this->calculateSumbs($totalMonths[17], $totalMonths[15]);
@@ -220,11 +221,13 @@ class DataTableController extends Controller
                         $groupData['total_month'] = $totalMonths[19];
                         $totalMonths[20] = $totalMonths[19];
                     }
+                    break;
                 case 21:
                     if (isset($totalMonths[20])) {
                         $groupData['total_month'] = $totalMonths[20];
                         $totalMonths[21] = $totalMonths[20];
                     }
+                    break;
                 case 23:
                     if (isset($totalMonths[18]) && isset($totalMonths[21]) && isset($totalMonths[22])) {
                         $groupData['total_month'] = $this->calculateDifference($totalMonths[18], $totalMonths[21]);
@@ -239,11 +242,13 @@ class DataTableController extends Controller
                         $groupData['total_month'] = $totalMonths[23];
                         $totalMonths[25] = $totalMonths[23];
                     }
+                    break;
                 case 26:
                     if (isset($totalMonths[25])) {
                         $groupData['total_month'] = $totalMonths[25];
                         $totalMonths[26] = $totalMonths[25];
                     }
+                    break;
 
                 case 27:
                     if (isset($totalMonths[22]) and isset($totalMonths[26])) {
@@ -256,6 +261,7 @@ class DataTableController extends Controller
                         $groupData['total_month'] = $totalMonths[27];
                         $totalMonths[28] = $totalMonths[27];
                     }
+                    break;
                 case 29:
                     if (isset($totalMonths[28]) and isset($totalMonths[21])) {
                         $groupData['total_month'] = $this->calculateSumbs($totalMonths[28], $totalMonths[21]);
