@@ -20,6 +20,7 @@ class ExportController extends Controller
     {
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'pl');
+        $title = "{$year}-Profit and Loss Report";
 
         $responseData = $this->fetchAndFormatData($year, $type);
 
@@ -27,7 +28,7 @@ class ExportController extends Controller
         //     "data" => $responseData,
         //     "year" => $year,
         // ]);
-        return Excel::download(new RequestExportPL($responseData, $year), "{$year}-Profit and Loss Report.xlsx");
+        return Excel::download(new RequestExportPL($responseData, $year, $title), "{$year}-Profit and Loss Report.xlsx");
     }
     private function fetchAndFormatData($year, $type)
     {
