@@ -37,6 +37,7 @@ class OrderController extends Controller
             if ($month == null && $year == null) {
                 $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'jpy', 'usd', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
+            
             if ($data_1->count() > 0) {
                 return response()->json([
                     "success" => true,

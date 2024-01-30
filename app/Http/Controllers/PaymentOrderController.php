@@ -64,9 +64,11 @@ class PaymentOrderController extends Controller
     }
     public function PaymentOrderId(Request $request, $id)
     {
-        $id = $request->route('id');
-        $query = 'SELECT * FROM payment_orders WHERE id = ? AND deleted_at IS NULL ORDER BY id ASC';
-        $payment_order = DB::select($query, [$id]);
+       $payment_order = PaymentOrder::find($id);
+        $exchangeRate = ExchangeRate::find($payment_order->exchange_rate_id);
+        $payment_order->jpy = $payment_order->vnd / $exchangeRate->jpy;
+        $payment_order->usd = $payment_order->vnd / $exchangeRate->usd;
+ 
         if ($payment_order == null) {
             return response()->json([
                 "success" => false,
@@ -82,7 +84,8 @@ class PaymentOrderController extends Controller
         return response()->json([
             "success" => true,
             "message" => "Get payment_order successfully",
-            "payment_order" => $payment_order
+            "payment_order" => $payment_order,
+
         ], 200);
     }
     public function create_payment_order(Request $request)
