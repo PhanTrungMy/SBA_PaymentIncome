@@ -11,18 +11,20 @@
             width: 80%;
             margin: 0 auto;
         }
-    
+
         th,
         td {
             border: 1px solid black;
             padding: 8px;
             text-align: center;
         }
-        h3{
+
+        h3 {
             text-align: center
         }
-        h4{
-            text-align:center
+
+        h4 {
+            text-align: center
         }
     </style>
 </head>
@@ -55,47 +57,45 @@
                 <th>当期累計</th>
             </tr>
             <thead>
-                    @for($i = 0; $i < count($data); $i++)
-                        @for($j = 0; $j < count($data[$i]["categories"]); $j ++)
-                            <tr>
-                                <th>{{$data[$i]["categories"][$j]["category_name"]}}</th>
-                                <th>{{$data[$i]["categories"][$j]["data"][$year-1]}}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-04"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-05"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-06"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-07"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-08"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-09"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-10"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-11"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year) . "-12"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year+1) . "-01"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year+1) . "-02"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"][($year+1) . "-03"] }}</th>
-                                <th>{{ $data[$i]["categories"][$j]["data"]["total"] }}</th>
+                @for($i = 0; $i < count($data); $i++) @for($j=0; $j < count($data[$i]["categories"]); $j ++) <tr>
+                    <th>{{$data[$i]["categories"][$j]["category_name"]}}</th>
+                    <th>{{$data[$i]["categories"][$j]["data"][$year-1]}}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-04"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-05"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-06"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-07"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-08"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-09"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-10"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-11"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year) . "-12"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year+1) . "-01"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year+1) . "-02"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"][($year+1) . "-03"], 2, '.', ',') }}</th>
+                    <th>{{ number_format($data[$i]["categories"][$j]["data"]["total"], 2, '.', ',') }}</th>
 
-                            </tr>
-                        @endfor
-                        <tr>
-                            <th>{{$data[$i]["group_name"]}}</th>
-                            <th>{{$data[$i]["total_month"][$year-1]}}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-04"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-05"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-06"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-07"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-08"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-09"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-10"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-11"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year) . "-12"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year+1) . "-01"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year+1) . "-02"] }}</th>
-                            <th>{{ $data[$i]["total_month"][($year+1) . "-03"] }}</th>
-                            <th>{{ $data[$i]["total_month"]["total"] }}</th>
-                        </tr>
+                    </tr>
+                    @endfor
+                    <tr>
+                        <th>{{$data[$i]["group_name"]}}</th>
+                        <th>{{number_format($data[$i]["total_month"][$year-1], 2, '.', ',')}}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-04"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-05"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-06"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-07"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-08"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-09"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-10"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-11"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year) . "-12"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year+1) . "-01"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year+1) . "-02"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"][($year+1) . "-03"], 2, '.', ',') }}</th>
+                        <th>{{ number_format($data[$i]["total_month"]["total"], 2, '.', ',') }}</th>
+                    </tr>
                     @endfor
             </thead>
-        </table>
+    </table>
 </body>
 
 </html>

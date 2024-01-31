@@ -58,6 +58,8 @@ class RequestExportPL implements FromView, WithEvents
                         ],
                     ]);
 
+                    $event->sheet->getDelegate()->getStyle("C5:O{$Number}")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_RIGHT);
+
                     $event->sheet->getDelegate()->getStyle("A4:A{$Number}")->getFont()->setBold(True);
                     $event->sheet->getDelegate()->getStyle("A4:A{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
                     $event->sheet->getDelegate()->getStyle("B4:B{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
@@ -74,7 +76,7 @@ class RequestExportPL implements FromView, WithEvents
                     $event->sheet->getDelegate()->getStyle("M4:M{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
                     $event->sheet->getDelegate()->getStyle("N4:N{$Number}")->getBorders()->getAllBorders()->setBorderStyle("medium");
                     $event->sheet->getDelegate()->getStyle("A4:A{$Number}")->getFont()->setSize(12)->setName('MS Mincho');
-                    $event->sheet->getDelegate()->getRowDimension("{$Number}")->setRowHeight(20);
+                    $event->sheet->getDelegate()->getRowDimension("{$Number}")->setRowHeight(25);
                 }
                 
                 $event->sheet->getDelegate()->getStyle('A4:N4')->applyFromArray([
