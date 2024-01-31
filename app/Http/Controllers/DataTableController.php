@@ -84,7 +84,6 @@ class DataTableController extends Controller
                     $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
                     $totalMonths[3] = $this->calculateSumForCategories($categoryIds, $year);
                     break;
-                    return $totalMonth[3];
                 case 5:
                     $categoryIds = [34, 35, 36, 37];
                     $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
