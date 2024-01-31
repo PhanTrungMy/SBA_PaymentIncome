@@ -109,6 +109,7 @@ Route::group([
     ],
 ], function () {
     // categories
+    Route::get('/all', [CategoryController::class, 'get_category_all']);
     Route::post('', [CategoryController::class, 'catogory_create']);
     Route::get('', [CategoryController::class, 'catogory_show_all']);
     Route::get('{id}', [CategoryController::class, 'catogory_show_id']);
