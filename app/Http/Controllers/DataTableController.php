@@ -54,7 +54,7 @@ class DataTableController extends Controller
                 }
             }
 
-            $totalMonth['total'] = round(array_sum($totalMonth), 3);
+            $totalMonth['total'] = round(array_sum($totalMonth), 2);
             $groupData['total_month'] = $totalMonth;
             $totalMonths[$group->id] = $totalMonth;
             array_push($data, $groupData);
@@ -82,9 +82,7 @@ class DataTableController extends Controller
                 case 3:
                     $categoryIds = [21, 22, 23, 24];
                     $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
-                    $totalMonths[3] = $this->calculateSumForCategories($categoryIds, $year);
                     break;
-                    return $totalMonth[3];
                 case 5:
                     $categoryIds = [34, 35, 36, 37];
                     $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
@@ -130,7 +128,7 @@ class DataTableController extends Controller
             $monthlyCost = 0;
             foreach ($payments as $payment) {
                 $exchangeRate = ExchangeRate::find($payment->exchange_rate_id);
-                $convertedCost = round($payment->cost / $exchangeRate->jpy, 3);
+                $convertedCost = round($payment->cost / $exchangeRate->jpy, 2);
                 $monthlyCost += $convertedCost;
             }
 
@@ -138,7 +136,7 @@ class DataTableController extends Controller
             $total += $monthlyCost;
         }
 
-        $monthlyTotals['total'] = round($total, 3);
+        $monthlyTotals['total'] = round($total, 2);
         return $monthlyTotals;
     }
     private function calculateSum($array1, $array2)
@@ -166,6 +164,7 @@ class DataTableController extends Controller
             $result = $this->calculateSum($result, $categoryData);
         }
 
+        $result['total'] = round(array_sum($result), 2);
         return $result;
     }
 
@@ -182,6 +181,7 @@ class DataTableController extends Controller
             }
         }
 
+        $result['total'] = round(array_sum($result), 2);
         return $result;
     }
 
@@ -227,7 +227,7 @@ class DataTableController extends Controller
             }
             $totalMonthCopy = $totalMonth;
             unset($totalMonthCopy[$year - 1]);
-            $totalMonth['total'] = round(array_sum($totalMonthCopy), 3);
+            $totalMonth['total'] = round(array_sum($totalMonthCopy), 2);
             $groupData['total_month'] = $totalMonth;
             $totalMonths[$group->id] = $totalMonth;
             array_push($data, $groupData);
@@ -372,7 +372,7 @@ class DataTableController extends Controller
 
         $monthlyTotals[$previousYear] = $previousYearBalance ? $previousYearBalance->amount : null;
 
-        $monthlyTotals['total'] = round($total, 3);
+        $monthlyTotals['total'] = round($total, 2);
 
         return $monthlyTotals;
     }
