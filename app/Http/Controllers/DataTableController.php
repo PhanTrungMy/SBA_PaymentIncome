@@ -79,6 +79,22 @@ class DataTableController extends Controller
                         $groupData['total_month'] = $this->calculateDifference($totalMonths[9], $categoryData);
                     }
                     break;
+                case 3:
+                    $categoryIds = [21, 22, 23, 24];
+                    $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
+                    $totalMonths[3] = $this->calculateSumForCategories($categoryIds, $year);
+                    break;
+                    return $totalMonth[3];
+                case 5:
+                    $categoryIds = [34, 35, 36, 37];
+                    $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
+                    $totalMonths[5] = $this->calculateSumForCategories($categoryIds, $year);
+                    break;
+                case 6:
+                    $groupIds = [2, 3, 4, 5, 6];
+                    $groupData['total_month'] = $this->calculateSumForGroups($groupIds, $year);
+                    $totalMonths[6] = $this->calculateSumForGroups($groupIds, $year);
+                    break;
             }
         }
 
@@ -139,6 +155,33 @@ class DataTableController extends Controller
         foreach ($array1 as $key => $value) {
             $result[$key] = $value - ($array2[$key] ?? 0);
         }
+        return $result;
+    }
+    private function calculateSumForCategories($categoryIds, $year)
+    {
+        $result = array_fill_keys($this->generateMonthKeys($year), 0);
+
+        foreach ($categoryIds as $categoryId) {
+            $categoryData = $this->calculateMonthlyTotalsForCategory($categoryId, $year);
+            $result = $this->calculateSum($result, $categoryData);
+        }
+
+        return $result;
+    }
+
+    private function calculateSumForGroups($groupIds, $year)
+    {
+        $result = array_fill_keys($this->generateMonthKeys($year), 0);
+
+        foreach ($groupIds as $groupId) {
+            $categories = Category::where('group_id', $groupId)->get();
+
+            foreach ($categories as $category) {
+                $categoryData = $this->calculateMonthlyTotalsForCategory($category->id, $year);
+                $result = $this->calculateSum($result, $categoryData);
+            }
+        }
+
         return $result;
     }
 
