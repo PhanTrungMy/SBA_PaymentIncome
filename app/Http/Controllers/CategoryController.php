@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -78,6 +79,29 @@ class CategoryController extends Controller
             'categories' => $transformedCategories
         ], 200);
     }
+public function get_category_all()
+{
+    $categories = DB::table('categories')
+        ->join('groups', 'categories.group_id', '=', 'groups.id')
+        ->select('categories.*', 'groups.report_type')
+        ->where('groups.report_type', 'pl') 
+        ->orderBy('categories.group_id', 'asc')
+        ->get();
+
+    if ($categories->count() == 0) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Category not found'
+        ], 404);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Get all categories successfully',
+        'categories' => $categories
+    ], 200);
+}
+
     public function catogory_show_id($id)
     {
         try {
