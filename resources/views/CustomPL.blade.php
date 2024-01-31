@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{{$year}}-Profit and loss Report</title>
 </head>
 <body>
     <h3><strong>月次比較財務諸表(損益計算書)</strong></h3>
