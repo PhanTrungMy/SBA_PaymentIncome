@@ -12,14 +12,15 @@ class PaymentOrderController extends Controller
 {
     public function get_all_payment_orders(Request $request)
     {
+        $direction = $request->query('direction') ?? "desc";
+        $key = $request->query('key') ?? "created_at";
         try {
             $resultPayments = [];
             $perPage = $request->query('per_page') ?? 5;
             $perPage = in_array($perPage, [5, 10, 20]) ? $perPage : 5;
             $month = $request["month"];
             $year = $request["year"];
-            $query = PaymentOrder::where('deleted_at', null)->orderBy('created_at', 'desc');
- 
+            $query = PaymentOrder::where('deleted_at', null)->orderBy($key, $direction);
             if ($month && $year) {
                 $query->whereMonth('payment_date', $month)
                     ->whereYear('payment_date', $year);

@@ -12,6 +12,8 @@ class OrderController extends Controller
 {
     function Get_all_order(Request $request)
     {
+        $direction = $request->query('direction') ?? "desc";
+        $key = $request->query('key') ?? "created_at";
         try {
             $perPage = $request->input('perPage', 5);
             $perPageOptions = [10, 20];
@@ -26,16 +28,16 @@ class OrderController extends Controller
             $currentPage = request()->query('page', $Page);
 
             if ($month != null && $year != null) {
-                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->whereMonth("order_date", "=", $month)->orderBy($key, $direction)->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($month == null && $year != null) {
-                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->whereYear("order_date", "=", $year)->orderBy($key, $direction)->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($month != null && $year == null) {
-                $data_1 = Order::whereNull('deleted_at')->whereMonth("order_date", "=", $month)->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->whereMonth("order_date", "=", $month)->orderBy($key, $direction)->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
             if ($month == null && $year == null) {
-                $data_1 = Order::whereNull('deleted_at')->orderBy('id', 'desc')->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
+                $data_1 = Order::whereNull('deleted_at')->orderBy($key, $direction)->paginate($perPage, ['id', 'user_id', 'company_name', 'vnd', 'exchange_rate_id', 'order_date', 'created_at', 'updated_at', 'deleted_at'], 'page', $currentPage);
             }
 
             // $exchange_rate_id = $request["exchange_rate_id"];
