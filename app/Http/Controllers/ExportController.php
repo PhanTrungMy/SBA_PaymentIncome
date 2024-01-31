@@ -22,12 +22,16 @@ class ExportController extends Controller
         $type = $request->input('type', 'pl');
         $title = "{$year}-Profit and Loss Report";
 
+        $year = 2023;
+
         $responseData = $this->fetchAndFormatData($year, $type);
 
         // return view("CustomPL", [
         //     "data" => $responseData,
         //     "year" => $year,
         // ]);
+
+        // return $responseData;
         return Excel::download(new RequestExportPL($responseData, $year, $title), "{$year}-Profit and Loss Report.xlsx");
     }
     private function fetchAndFormatData($year, $type)
@@ -62,7 +66,7 @@ class ExportController extends Controller
                 }
             }
 
-            $totalMonth['total'] = round(array_sum($totalMonth), 3);
+            $totalMonth['total'] = round(array_sum($totalMonth), 2);
             $groupData['total_month'] = $totalMonth;
             $totalMonths[$group->id] = $totalMonth;
             array_push($data, $groupData);
@@ -86,6 +90,20 @@ class ExportController extends Controller
                         $categoryData = $this->calculateMonthlyTotalsForCategory(42, $year);
                         $groupData['total_month'] = $this->calculateDifference($totalMonths[9], $categoryData);
                     }
+                    break;
+                case 3:
+                    $categoryIds = [21, 22, 23, 24];
+                    $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
+                    break;
+                case 5:
+                    $categoryIds = [34, 35, 36, 37];
+                    $groupData['total_month'] = $this->calculateSumForCategories($categoryIds, $year);
+                    $totalMonths[5] = $this->calculateSumForCategories($categoryIds, $year);
+                    break;
+                case 6:
+                    $groupIds = [2, 3, 4, 5, 6];
+                    $groupData['total_month'] = $this->calculateSumForGroups($groupIds, $year);
+                    $totalMonths[6] = $this->calculateSumForGroups($groupIds, $year);
                     break;
             }
         }
@@ -122,7 +140,7 @@ class ExportController extends Controller
             $monthlyCost = 0;
             foreach ($payments as $payment) {
                 $exchangeRate = ExchangeRate::find($payment->exchange_rate_id);
-                $convertedCost = round($payment->cost / $exchangeRate->jpy, 3);
+                $convertedCost = round($payment->cost / $exchangeRate->jpy, 2);
                 $monthlyCost += $convertedCost;
             }
 
@@ -130,7 +148,7 @@ class ExportController extends Controller
             $total += $monthlyCost;
         }
 
-        $monthlyTotals['total'] = round($total, 3);
+        $monthlyTotals['total'] = round($total, 2);
         return $monthlyTotals;
     }
     private function calculateSum($array1, $array2)
@@ -149,17 +167,49 @@ class ExportController extends Controller
         }
         return $result;
     }
+    private function calculateSumForCategories($categoryIds, $year)
+    {
+        $result = array_fill_keys($this->generateMonthKeys($year), 0);
+
+        foreach ($categoryIds as $categoryId) {
+            $categoryData = $this->calculateMonthlyTotalsForCategory($categoryId, $year);
+            $result = $this->calculateSum($result, $categoryData);
+        }
+
+        $result['total'] = round(array_sum($result), 2);
+        return $result;
+    }
+
+    private function calculateSumForGroups($groupIds, $year)
+    {
+        $result = array_fill_keys($this->generateMonthKeys($year), 0);
+
+        foreach ($groupIds as $groupId) {
+            $categories = Category::where('group_id', $groupId)->get();
+
+            foreach ($categories as $category) {
+                $categoryData = $this->calculateMonthlyTotalsForCategory($category->id, $year);
+                $result = $this->calculateSum($result, $categoryData);
+            }
+        }
+        $result['total'] = round(array_sum($result), 2);
+        return $result;
+    }
 
     public function get_data_table_bs(Request $request)
     {
         $year = $request->input('y', date('Y'));
         $type = $request->input('type', 'bs');
 
+        $year = 2023;
+
         $responseData = $this->fetchAndFormatDatabs($year, $type);
         // return view("Custom", [
         //     "data" => $responseData,
         //     "year" => $year
         // ]);
+
+        // return $responseData;
 
 
         // return view("Custom", ["data" => $responseData]);

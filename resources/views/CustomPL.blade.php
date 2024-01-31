@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{$year}}-Profit and loss Report</title>
+    <title>Document</title>
 </head>
 <body>
     <h3><strong>月次比較財務諸表(損益計算書)</strong></h3>
@@ -35,21 +35,21 @@
                                 <tr>
                                     <th>{{ $category['category_name'] }}</th>
                                     @foreach($category["data"] as $item)
-                                        <th>{{ $item }}</th>
+                                        <th>{{ number_format($item, 2, '.', ',') }}</th>
                                     @endforeach
                                 </tr>
                             @endforeach
                         <tr>
                             <th>{{$data[$i]["group_name"]}}</th>
                             @foreach($data[$i]["total_month"] as $itemData)
-                                <th>{{$itemData}}</th>
+                                <th>{{number_format($itemData, 2, '.', ',')}}</th>
                             @endforeach
                         </tr>
                         @else
                             <tr>
                                 <th>{{$data[$i]["group_name"]}}</th>
                                 @foreach($data[$i]["total_month"] as $itemData)
-                                    <th>{{$itemData}}</th>
+                                    <th>{{number_format($itemData, 2, '.', ',')}}</th>
                                 @endforeach
                             </tr>
                         @endif
@@ -57,4 +57,3 @@
         </thead>
     </table>
 </body>
-</html>
