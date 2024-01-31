@@ -12,10 +12,12 @@ class OutsourcingController extends Controller
 {
     public function show_all_outsourcing(Request $request)
     {
+        $direction = $request->query('direction') ?? "desc";
+        $key = $request->query('key') ?? "created_at";
         try {
             $perPage = $request->query('per_page', 5);
             $page = $request->query('page', 1);
-            $outsourcing = Outsourcing::whereNull('deleted_at')->orderBy('created_at', 'desc');
+            $outsourcing = Outsourcing::whereNull('deleted_at')->orderBy($key, $direction);
             if ($request->has('month')) {
                 $month = $request->query('month');
                 $outsourcing = $outsourcing->whereMonth('outsourced_date', $month);
