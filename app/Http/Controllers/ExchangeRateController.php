@@ -77,7 +77,7 @@ class ExchangeRateController extends Controller
     {
         $id = $request["id"];
         $exchangeDate = $request["exchangeDate"];
-        $formattedDate = Carbon::createFromFormat('m-Y', $exchangeDate)->format('Y-m');
+        // $formattedDate = Carbon::createFromFormat('m-Y', $exchangeDate)->format('Y-m');
         $jpy = $request["jpy"];
         $usd = $request["usd"];
         $exchangeRate = Validator::make($request->all(), [
@@ -101,7 +101,7 @@ class ExchangeRateController extends Controller
                     $result = DB::table("exchange_rates")->insertGetId([
                         "jpy" => $jpy,
                         "usd" => $usd,
-                        "exchange_rate_month" => $formattedDate
+                        "exchange_rate_month" => $exchangeDate
                     ]);
                     return response()->json([
                         "success" => true,
@@ -119,7 +119,7 @@ class ExchangeRateController extends Controller
                     ->update([
                             "jpy" => $jpy,
                             "usd" => $usd,
-                            "exchange_rate_month" => $formattedDate
+                            "exchange_rate_month" => $exchangeDate
                     ]);
                     return response()->json([
                         "success" => true,
